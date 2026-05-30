@@ -157,12 +157,17 @@ Active skills: 61 (down from 104).
 - Model name corrected to `claude-haiku-4-5` (unversioned) for pricing table match
 - config.yaml wiped twice by `sed -i` — switched to Python/Write tool for file edits
 - Mhai2 auto-created skills during sessions: fdhh-weekly-meeting-workflow, papers references, project-files references
-- Today's cost: $0.62 (154K output tokens); 27.9M total input (26M cache reads, free)
+- Diagnosed cost reporting — DB only captures partial tokens; auxiliary model calls missing
+- Read Anthropic console via browser: Haiku cost $14.93 today (47.1M input, 418K output)
+- Correct pricing: 72% of input = cache reads at $0.08/M; 28% uncached at $0.80/M
+- Effective average input rate ~$0.28/M; output $4.00/M
+- Fixed monitoring skill with correct formula: cost = uncached*0.80 + cache_read*0.08 + cache_write*1.00 + output*4.00 (all /1M)
+- Never use `sed -i` on config files — wipes them; use Write tool instead
 
 ### Cost summary (verified via Anthropic console 2026-05-30)
 - Total May spend: $38.00 USD ($22.00 credits remaining)
-- Haiku (Mhai2) month-to-date: $14.93 — almost entirely today's setup session
-- Remainder ($23.07): Claude Code / Sonnet / Opus sessions
-- To see Mhai2-only cost: filter by Model = "Claude Haiku 4.5" on console Cost page
-- Typical non-setup day expected: $1-3/day
-- Use /reset between topics to keep costs down
+- Haiku (Mhai2) today: $14.93 — heavy setup day (47.1M input, 418K output)
+- Remainder ($23.07): Claude Code / Sonnet / Opus sessions this month
+- To see Mhai2-only cost: filter by Model = "Claude Haiku 4.5" on Anthropic console Cost page
+- Typical non-setup day expected: $1-3/day with compression tightened
+- Cache reads (72% of input) billed at $0.08/M — 10x cheaper than uncached
