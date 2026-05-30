@@ -20,7 +20,7 @@ metadata:
 | XiChen26honors | ~/Desktop/StudentProjects/XiChen26honors/ | — |
 | GlebPhD | ~/Desktop/StudentProjects/GlebPhD/ | — |
 | MATH8702 | ~/Desktop/StudentProjects/MATH8702/ | — |
-| DBT | knowledge base only | — |
+| DBT | ~/projects/DBT/ | Session chunks, CLAUDE.md (MCP Gmail/Drive tasks) |
 | Recipes | knowledge base only | — |
 | Personal | no filesystem path | — |
 
@@ -211,3 +211,5 @@ pandoc document.md -o document.pdf \
 - **FdHMH:** 
   - `references/fdhmh-structure.md` — manuscript layout, Monday meeting schedule, algorithm reference, collaboration with Frank de Hoog (CSIRO)
   - `references/fdhmh-terminology.md` — matrix decomposition terminology, code language pair (Julia + Octave), algorithm status (June 2026)
+- **DBT:**
+  - `references/dbt-session-learning-workflow.md` — workflow for extracting, summarizing, and learning from session transcripts; key patterns in DBT teaching (attachment, nervous system, bottom-up regulation)

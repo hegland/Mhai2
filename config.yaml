@@ -76,4 +76,4 @@ hooks_auto_accept: true
 
 platform_toolsets:
   cli: [hermes-cli]
-  telegram: [hermes-telegram]
+  telegram: [hermes-telegram, browser]
