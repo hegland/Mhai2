@@ -798,18 +798,30 @@ def check_backup() -> str:
 # Paper search
 # ---------------------------------------------------------------------------
 
-def search_arxiv(query: str, max_results: int = 5) -> str:
+_arxiv_last_query_time: float = 0.0
+_ARXIV_MIN_INTERVAL = 5.0  # seconds between queries — arXiv enforces ~3s, we use 5s to be safe
+
+def search_arxiv(query: str, max_results: int = 5, sort_by_date: bool = False) -> str:
+    import arxiv, time
+    global _arxiv_last_query_time
+    # Enforce minimum interval between queries
+    elapsed = time.time() - _arxiv_last_query_time
+    if elapsed < _ARXIV_MIN_INTERVAL:
+        time.sleep(_ARXIV_MIN_INTERVAL - elapsed)
     try:
-        import arxiv
-        search = arxiv.Search(query=query, max_results=max_results, sort_by=arxiv.SortCriterion.Relevance)
+        sort = arxiv.SortCriterion.SubmittedDate if sort_by_date else arxiv.SortCriterion.Relevance
+        client = arxiv.Client(page_size=max_results, delay_seconds=5, num_retries=5)
+        search = arxiv.Search(query=query, max_results=max_results, sort_by=sort)
         results = []
-        for r in search.results():
+        for r in client.results(search):
             authors = ", ".join(a.name for a in r.authors[:3])
             if len(r.authors) > 3:
                 authors += " et al."
             results.append(f"• {r.title}\n  {authors} ({r.published.year})\n  {r.entry_id}")
+        _arxiv_last_query_time = time.time()
         return "\n\n".join(results) if results else "No results found."
     except Exception as e:
+        _arxiv_last_query_time = time.time()
         return f"ArXiv search error: {e}"
 
 
