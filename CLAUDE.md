@@ -123,6 +123,15 @@ Rules:
 
 ## Session Log
 
+### Skill management
+Irrelevant bundled skills are archived (not deleted) in:
+- `~/.hermes/skills/.archive/` — user-synced skills
+- `~/.hermes/hermes-agent/skills/.archive/` — bundled skills
+
+Hermes excludes `.archive` directories automatically (defined in `agent/skill_utils.py` `EXCLUDED_SKILL_DIRS`).
+To re-enable a skill, move it back out of `.archive/` and restart the gateway.
+Active skills: 61 (down from 104).
+
 ### 2026-05-30
 - Installed Hermes Agent Framework (`curl ... | bash`)
 - Configured with Anthropic API + new Telegram bot
@@ -136,3 +145,6 @@ Rules:
   - Embedded Julia and Octave code files via `\lstinputlisting`
   - Added page breaks before each code section
   - Committed and pushed to FdHMH repo (development branch)
+- Fixed arxiv Python API (v4 requires `client.results()` not `search.results()`)
+- Added 5s rate limiting between arXiv queries to avoid HTTP 429 bans
+- Reduced active Hermes skills from 104 to 61 by archiving irrelevant ones
