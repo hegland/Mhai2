@@ -1,6 +1,6 @@
 ---
 name: monitoring
-description: "Report Mhai2 resource usage: token counts, API costs, session stats, and Anthropic billing."
+description: "Report Mhai2 resource usage and cost estimate."
 version: 1.0.0
 author: Mhai2
 platforms: [linux]
@@ -11,103 +11,85 @@ metadata:
 
 # Mhai2 Monitoring
 
-## Claude API pricing
+## Pricing (claude-haiku-4-5, Anthropic 2026)
 
-- claude-haiku-4-5: $1.00/M input, $5.00/M output, $0.10/M cache read, $1.25/M cache write
-- claude-sonnet-4-6: $3.00/M input, $15.00/M output, $0.30/M cache read, $3.75/M cache write
+- Input (uncached): $0.80/M
+- Output:           $4.00/M
+- Cache read:       $0.08/M
+- Cache write:      $1.00/M
 
-## IMPORTANT: Token counting
-
-`input_tokens` in the DB = only uncached new tokens per turn.
-The full input cost = input_tokens + cache_read_tokens + cache_write_tokens.
-Cache read tokens dominate (prompt caching re-uses system prompt + history each turn).
-Always include all three columns for accurate cost.
-
-## Today's usage
+## Cost estimate (today)
 
 ```bash
 python3 << 'EOF'
 import sqlite3
 from datetime import datetime
 conn = sqlite3.connect('/home/hegland/.hermes/state.db')
-# Pricing per million tokens
-P = {
-    'haiku':  {'in': 1.00, 'out': 5.00, 'cr': 0.10, 'cw': 1.25},
-    'sonnet': {'in': 3.00, 'out': 15.00, 'cr': 0.30, 'cw': 3.75},
-}
 today = datetime.now().strftime('%Y-%m-%d')
 rows = conn.execute('''
-    SELECT model, started_at, input_tokens, output_tokens,
-           cache_read_tokens, cache_write_tokens, message_count, tool_call_count
-    FROM sessions
-    WHERE date(started_at, "unixepoch") = ?
+    SELECT started_at, input_tokens, output_tokens, cache_read_tokens, cache_write_tokens,
+           message_count, tool_call_count
+    FROM sessions WHERE date(started_at, "unixepoch") = ?
     ORDER BY started_at DESC
 ''', (today,)).fetchall()
-
-totals = dict(inp=0, out=0, cr=0, cw=0, cost=0.0)
+ti=to=tcr=tcw=0
 print(f"Today ({today}): {len(rows)} sessions\n")
-for r in rows:
-    model, ts, inp, out, cr, cw, msgs, tools = r
+for ts, inp, out, cr, cw, msgs, tools in rows:
     inp=inp or 0; out=out or 0; cr=cr or 0; cw=cw or 0
+    cost = (inp*0.80 + out*4.00 + cr*0.08 + cw*1.00) / 1_000_000
     dt = datetime.fromtimestamp(ts).strftime('%H:%M') if ts else '?'
-    p = P['sonnet'] if 'sonnet' in (model or '') else P['haiku']
-    cost = (inp*p['in'] + out*p['out'] + cr*p['cr'] + cw*p['cw']) / 1_000_000
-    total_in = inp + cr + cw
-    for k,v in zip(['inp','out','cr','cw'],[inp,out,cr,cw]): totals[k]+=v
-    totals['cost'] += cost
-    print(f"  {dt} | in={total_in:,} (cache_read={cr:,}) out={out:,} | msgs={msgs or 0} tools={tools or 0} | ${cost:.4f}")
-
-total_in = totals['inp'] + totals['cr'] + totals['cw']
-print(f"\nTOTAL")
-print(f"  Input:       {total_in:,} tokens  (new={totals['inp']:,} cache_read={totals['cr']:,} cache_write={totals['cw']:,})")
-print(f"  Output:      {totals['out']:,} tokens")
-print(f"  Cost:        ${totals['cost']:.4f}")
-print(f"\n👉 Verify: https://console.anthropic.com/settings/usage")
+    ti+=inp; to+=out; tcr+=cr; tcw+=cw
+    print(f"  {dt} out={out:,} cache_read={cr:,} ${cost:.4f}")
+total = (ti*0.80 + to*4.00 + tcr*0.08 + tcw*1.00) / 1_000_000
+print(f"\nTOTAL: out={to:,} cache_read={tcr:,} cache_write={tcw:,}")
+print(f"COST:  ${total:.2f}  (lower bound — auxiliary model calls not included)")
+print(f"\n👉 https://console.anthropic.com/settings/usage")
 EOF
 ```
 
-## All-time usage
+## All-time cost
 
 ```bash
 python3 << 'EOF'
 import sqlite3
 conn = sqlite3.connect('/home/hegland/.hermes/state.db')
-P = {'haiku': (1.00, 5.00, 0.10, 1.25), 'sonnet': (3.00, 15.00, 0.30, 3.75)}
-rows = conn.execute('''
-    SELECT model, COUNT(*), SUM(input_tokens), SUM(output_tokens),
-           SUM(cache_read_tokens), SUM(cache_write_tokens)
-    FROM sessions GROUP BY model ORDER BY SUM(cache_read_tokens) DESC
-''').fetchall()
-print("All-time by model:")
-total_cost = 0
-for model, sessions, inp, out, cr, cw in rows:
-    inp=inp or 0; out=out or 0; cr=cr or 0; cw=cw or 0
-    p = P['sonnet'] if 'sonnet' in (model or '') else P['haiku']
-    cost = (inp*p[0] + out*p[1] + cr*p[2] + cw*p[3]) / 1_000_000
-    total_cost += cost
-    print(f"  {model}: {sessions} sessions | in={inp+cr+cw:,} out={out:,} | ${cost:.4f}")
-print(f"\n  TOTAL COST: ${total_cost:.4f}")
+r = conn.execute('SELECT SUM(input_tokens), SUM(output_tokens), SUM(cache_read_tokens), SUM(cache_write_tokens) FROM sessions').fetchone()
+inp,out,cr,cw = [x or 0 for x in r]
+cost = (inp*0.80 + out*4.00 + cr*0.08 + cw*1.00) / 1_000_000
+print(f"All-time: out={out:,} cache_read={cr:,} → ${cost:.2f} (lower bound)")
 EOF
 ```
 
 ## Gateway health
 
 ```bash
-hermes gateway status && tail -5 ~/.hermes/logs/gateway.log
+hermes gateway status && tail -3 ~/.hermes/logs/gateway.log
 ```
 
-## Open Anthropic billing
+## Anthropic console (authoritative)
 
 ```bash
 xdg-open https://console.anthropic.com/settings/usage
 ```
 
-## Billing note (updated 2026-05-30)
+## Verified billing (2026-05-30)
 
-On Markus's current Anthropic plan, cache read and cache write tokens appear to be
-free/included. Only output tokens are billed. When reporting cost, use:
+- Month-to-date cost: $38.00 USD (all of May 2026)
+- Credits remaining: $22.00 USD
+- Includes both Mhai2 and Claude Code sessions
+- No web search, code execution, or session runtime costs
 
-cost = output_tokens * 4.00 / 1_000_000   (haiku output rate)
+## Haiku-specific cost (Mhai2 only)
 
-This matches the Anthropic console figure exactly.
-The cache token counts are still useful for understanding context size and compression efficiency.
+Filter by Model = "Claude Haiku 4.5" on the Cost page for Mhai2-only figures.
+Verified 2026-05-30: $14.93 for Haiku month-to-date (almost entirely today's setup session).
+
+## Correct cost formula (verified 2026-05-30)
+
+Anthropic bills cache read tokens at $0.08/M, not $0.80/M.
+Typical session: ~72% cache reads, ~28% uncached input.
+
+Accurate formula:
+  cost = uncached_input * 0.80/1M + cache_read * 0.08/1M + cache_write * 1.00/1M + output * 4.00/1M
+
+Verified: 47.15M input (13.2M uncached + 34.0M cache read) + 418K output = $14.93
