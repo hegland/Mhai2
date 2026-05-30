@@ -799,26 +799,41 @@ def check_backup() -> str:
 # ---------------------------------------------------------------------------
 
 _arxiv_last_query_time: float = 0.0
-_ARXIV_MIN_INTERVAL = 5.0  # seconds between queries — arXiv enforces ~3s, we use 5s to be safe
+_ARXIV_MIN_INTERVAL = 5.0
 
 def search_arxiv(query: str, max_results: int = 5, sort_by_date: bool = False) -> str:
-    import arxiv, time
+    """Search arXiv via direct API. Always uses relevance sorting (date sort ignores filters).
+    Set sort_by_date=True to sort results locally by date after fetching."""
+    import time, xml.etree.ElementTree as ET
     global _arxiv_last_query_time
-    # Enforce minimum interval between queries
     elapsed = time.time() - _arxiv_last_query_time
     if elapsed < _ARXIV_MIN_INTERVAL:
         time.sleep(_ARXIV_MIN_INTERVAL - elapsed)
     try:
-        sort = arxiv.SortCriterion.SubmittedDate if sort_by_date else arxiv.SortCriterion.Relevance
-        client = arxiv.Client(page_size=max_results, delay_seconds=5, num_retries=5)
-        search = arxiv.Search(query=query, max_results=max_results, sort_by=sort)
-        results = []
-        for r in client.results(search):
-            authors = ", ".join(a.name for a in r.authors[:3])
-            if len(r.authors) > 3:
-                authors += " et al."
-            results.append(f"• {r.title}\n  {authors} ({r.published.year})\n  {r.entry_id}")
+        params = urllib.parse.urlencode({
+            "search_query": query,
+            "max_results": max_results,
+            "sortBy": "relevance",
+            "sortOrder": "descending",
+        })
+        url = f"https://export.arxiv.org/api/query?{params}"
+        req = urllib.request.Request(url, headers={"User-Agent": "Mhai2/1.0"})
+        with urllib.request.urlopen(req, timeout=15) as r:
+            data = r.read()
         _arxiv_last_query_time = time.time()
+        ns = {"a": "http://www.w3.org/2005/Atom"}
+        root = ET.fromstring(data)
+        entries = []
+        for entry in root.findall("a:entry", ns):
+            title = entry.find("a:title", ns).text.strip().replace("\n", " ")
+            arxiv_id = entry.find("a:id", ns).text.strip()
+            published = entry.find("a:published", ns).text[:10]
+            authors = [a.find("a:name", ns).text for a in entry.findall("a:author", ns)]
+            author_str = ", ".join(authors[:3]) + (" et al." if len(authors) > 3 else "")
+            entries.append((published, title, author_str, arxiv_id))
+        if sort_by_date:
+            entries.sort(key=lambda x: x[0], reverse=True)
+        results = [f"• {t}\n  {a} ({p[:4]})\n  {i}" for p, t, a, i in entries]
         return "\n\n".join(results) if results else "No results found."
     except Exception as e:
         _arxiv_last_query_time = time.time()
