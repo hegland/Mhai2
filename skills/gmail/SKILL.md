@@ -11,33 +11,42 @@ metadata:
 
 # Gmail Search
 
+**Setup required:** Gmail access uses Google Workspace OAuth. See `google-workspace-setup` skill for a step-by-step guided walkthrough.
+
 Only markus.hegland@gmail.com is integrated. ANU Outlook (markus.hegland@anu.edu.au) is NOT accessible.
-If Markus mentions a work/research email, ask him to paste it into the chat.
 
-## Search Gmail (natural language)
+## After OAuth Setup
 
-```bash
-cd ~/projects/Mhai2 && python3 -c "
-from mhai_skills import parse_gmail_query
-print(parse_gmail_query('YOUR QUERY'))
-"
-```
-
-## Examples
+Once authenticated via `google-workspace` skill, use:
 
 ```bash
-# Unread emails
-python3 -c "from mhai_skills import parse_gmail_query; print(parse_gmail_query('unread emails'))"
+GAPI="python ${HERMES_HOME:-$HOME/.hermes}/skills/productivity/google-workspace/scripts/google_api.py"
 
-# Emails from a person
-python3 -c "from mhai_skills import search_gmail; print(search_gmail('from:zbigniew', max_results=5))"
+# Search Gmail
+$GAPI gmail search "is:unread" --max 10
+$GAPI gmail search "from:magda dropbox" --max 5
+$GAPI gmail search "has:attachment newer_than:7d"
 
-# Emails this week
-python3 -c "from mhai_skills import parse_gmail_query; print(parse_gmail_query('emails this week'))"
+# Read full message
+$GAPI gmail get MESSAGE_ID
 
-# Emails with attachment
-python3 -c "from mhai_skills import parse_gmail_query; print(parse_gmail_query('emails with attachment'))"
+# Send email (confirm with user first)
+$GAPI gmail send --to user@example.com --subject "Hello" --body "Message"
 ```
+
+## Gmail Search Syntax
+
+Use standard Gmail operators:
+- `from:` — emails from a specific person
+- `to:` — emails sent to someone
+- `subject:` — search in subject line
+- `is:unread` — unread emails
+- `has:attachment` — emails with files
+- `newer_than:7d` — last 7 days
+- `before:`, `after:` — date ranges
+- Combine with `AND`, `OR`, `-` (not)
+
+**Example:** `from:magda dropbox newer_than:30d` finds recent emails from Magda mentioning Dropbox.
 
 ## Pasted emails
 If Markus pastes an email into the chat, it is automatically saved to:

@@ -164,6 +164,17 @@ Active skills: 61 (down from 104).
 - Fixed monitoring skill with correct formula: cost = uncached*0.80 + cache_read*0.08 + cache_write*1.00 + output*4.00 (all /1M)
 - Never use `sed -i` on config files — wipes them; use Write tool instead
 
+### Post-setup session (same day)
+- Mhai2 auto-updated gmail skill to use google-workspace OAuth flow
+- Mhai2 transcribed DBT audio file locally using Whisper CLI (`~/.local/bin/whisper`)
+  - File: `~/projects/DBT/Group 1, Session 7.6.m4a`
+  - Runs on CPU, no API cost, no internet needed
+- Command approval prompts kept enabled (yolo: false) — working as intended
+- Gmail setup: existing Google OAuth client found in `~/.config/gcalendar/default_v1.dat`
+  - `setup_gmail.py` written in Mhai2/ but not yet run (browser auth page looked unofficial)
+  - Mhai2 google-workspace skill can guide through proper setup interactively
+- DBT project added to Mhai2 — audio transcription via Whisper working
+
 ### Cost summary (verified via Anthropic console 2026-05-30)
 - Total May spend: $38.00 USD ($22.00 credits remaining)
 - Haiku (Mhai2) today: $14.93 — heavy setup day (47.1M input, 418K output)
