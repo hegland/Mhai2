@@ -148,3 +148,20 @@ Active skills: 61 (down from 104).
 - Fixed arxiv Python API (v4 requires `client.results()` not `search.results()`)
 - Added 5s rate limiting between arXiv queries to avoid HTTP 429 bans
 - Reduced active Hermes skills from 104 to 61 by archiving irrelevant ones
+- Installed `pandoc-include` for embedding code files in markdown PDFs
+- Tightened context compression (threshold 30%, hard limit 200 messages)
+- Set session auto-reset after 60 min idle and at 4am daily
+- Added `project_reset.py` pre_gateway_dispatch hook — auto-resets session on project switch
+- Diagnosed cost reporting: only output tokens billed ($4.00/M Haiku); cache tokens free on current plan
+- Fixed monitoring skill to include cache_read + cache_write tokens in total input count
+- Model name corrected to `claude-haiku-4-5` (unversioned) for pricing table match
+- config.yaml wiped twice by `sed -i` — switched to Python/Write tool for file edits
+- Mhai2 auto-created skills during sessions: fdhh-weekly-meeting-workflow, papers references, project-files references
+- Today's cost: $0.62 (154K output tokens); 27.9M total input (26M cache reads, free)
+
+### Cost summary
+- Only output tokens are billed on current Anthropic plan
+- Cache read/write tokens are free (26M cache reads today = $0 charged)
+- Haiku output rate: $4.00/M tokens
+- Typical day: $0.50–2.00 depending on session length and verbosity
+- Use /reset between topics to keep output tokens low
