@@ -159,9 +159,10 @@ Active skills: 61 (down from 104).
 - Mhai2 auto-created skills during sessions: fdhh-weekly-meeting-workflow, papers references, project-files references
 - Today's cost: $0.62 (154K output tokens); 27.9M total input (26M cache reads, free)
 
-### Cost summary
-- Only output tokens are billed on current Anthropic plan
-- Cache read/write tokens are free (26M cache reads today = $0 charged)
-- Haiku output rate: $4.00/M tokens
-- Typical day: $0.50–2.00 depending on session length and verbosity
-- Use /reset between topics to keep output tokens low
+### Cost summary (verified via Anthropic console 2026-05-30)
+- Total May spend: $38.00 USD ($22.00 credits remaining)
+- Haiku (Mhai2) month-to-date: $14.93 — almost entirely today's setup session
+- Remainder ($23.07): Claude Code / Sonnet / Opus sessions
+- To see Mhai2-only cost: filter by Model = "Claude Haiku 4.5" on console Cost page
+- Typical non-setup day expected: $1-3/day
+- Use /reset between topics to keep costs down
