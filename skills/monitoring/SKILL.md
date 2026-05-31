@@ -1,7 +1,7 @@
 ---
 name: monitoring
-description: "Report Mhai2 cost — requires Markus to check the Anthropic console or ask Claude Code."
-version: 1.0.0
+description: "Report Mhai2 cost, API calls, and data transfer — run cost_report.py for full breakdown."
+version: 1.1.0
 author: Mhai2
 platforms: [linux]
 metadata:
@@ -11,26 +11,31 @@ metadata:
 
 # Mhai2 Monitoring
 
-## How to answer "how much have I spent today?"
+## Cost, API calls and data transfer report
 
-I cannot access the Anthropic console directly — it requires authentication I don't have.
+Run this to get today's full breakdown:
 
-Tell Markus:
-"I can't read the Anthropic console directly as it requires your login.
-Please check: https://platform.claude.com/workspaces/default/cost?model=Claude+Haiku+4.5&range=today
-Or ask Claude Code to read it for you — it has browser access to your logged-in session."
+```bash
+python3 ~/projects/Mhai2/cost_report.py
+```
 
-## Verified costs (checked by Claude Code via browser)
+Options:
+- `python3 ~/projects/Mhai2/cost_report.py 2` — last 2 days
+- `python3 ~/projects/Mhai2/cost_report.py --all` — all time
 
-- 2026-05-30: $13.96 USD (Claude Haiku 4.5, today) — heavy setup day
-- Credits remaining: $21.76 USD
+Output columns: Time (AEST) | Cost | API calls | Messages | Upload | Download | Cache reads | Cache writes | Session title
+
+- **Upload** = uncached input + cache writes sent to Anthropic (~4 bytes/token)
+- **Download** = output tokens received from Anthropic
+- **Cache R** = tokens Anthropic read from their cache (not re-sent by us, billed at $0.08/M)
+- **Cache W** = tokens written to Anthropic cache (billed at $1.00/M)
 
 ## Pricing reference
 
-- Input uncached: $0.80/M
-- Input cache read: $0.08/M
-- Input cache write: $1.00/M  
-- Output: $4.00/M
+- Input uncached: $0.80/M tokens
+- Input cache read: $0.08/M tokens
+- Input cache write: $1.00/M tokens
+- Output: $4.00/M tokens
 
 ## Gateway health
 
