@@ -230,6 +230,11 @@ Active skills: 61 (down from 104).
 ### 2026-06-01
 - Updated Hermes framework (121 new commits) — Telegram retry fixes, compression improvements, security patch (CVE-2026-48710)
 - Fixed Ctrl+V keybinding in Claude Code — unbound `chat:imagePaste` to stop popup interrupting terminal paste
+- Claude Code TUI copy/paste workflow (Linux terminal):
+  - Select text: Shift+click and drag (bypasses TUI mouse capture)
+  - Copy: Ctrl+Shift+C
+  - Paste: Ctrl+Shift+V (or Ctrl+V now that image paste is unbound)
+  - Ctrl+C cannot be used for copy — hardcoded as SIGINT interrupt in Linux terminals
 - Added "Response Discipline" section to SOUL.md — Mhai2 must not volunteer unsolicited code in a second language or anticipate unrequested follow-up tasks
 - Skill audit: cut active skills from 110 → 40 by archiving unused builtins (creative, gaming, media, mlops, github, etc.)
   - Cache write tokens per session expected to drop ~60% (~190K → ~75K), saving ~$0.10–0.12/session
