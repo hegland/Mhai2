@@ -36,6 +36,10 @@ journalctl --user -u hermes-gateway -f   # live logs
 ~/.hermes/logs/gateway.log               # full log file
 ```
 
+Mhai2 sends a Telegram message ("☀️ Good morning — I'm up and ready.") automatically ~8s after the gateway starts. Implemented via a companion systemd service:
+- Script: `~/.hermes/hooks/notify_startup.sh`
+- Service: `~/.config/systemd/user/hermes-gateway-notify.service` (bound to hermes-gateway, auto-starts with it)
+
 ## Configuration
 
 - `~/.hermes/config.yaml` — model, provider, auxiliary models, memory limits
@@ -200,6 +204,7 @@ Active skills: 61 (down from 104).
   - Fix: rewrote hook to use word-boundary regex; removed overly generic single-word triggers
   - Idle timeout already at 4h (`session_reset.idle_minutes: 240`), daily reset at 4am (`at_hour: 4`)
   - Cache write pricing: $1.00/M (10× more expensive than cache reads at $0.08/M) — minimising session resets is key
+- Added startup Telegram notification: Mhai2 sends "☀️ Good morning — I'm up and ready." on every gateway start
 
 ### Post-setup session (same day)
 - Mhai2 auto-updated gmail skill to use google-workspace OAuth flow
