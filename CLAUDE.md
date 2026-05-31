@@ -205,6 +205,8 @@ Active skills: 61 (down from 104).
   - Idle timeout already at 4h (`session_reset.idle_minutes: 240`), daily reset at 4am (`at_hour: 4`)
   - Cache write pricing: $1.00/M (10× more expensive than cache reads at $0.08/M) — minimising session resets is key
 - Added startup Telegram notification: Mhai2 sends "☀️ Good morning — I'm up and ready." on every gateway start
+- Added per-session cost reporting: `project_reset.py` hook sends a cost summary to Telegram on `/new` or project switch
+  - Format: `📊 <session title>\n<msgs> msgs · $<cost> (in <tokens> / out <tokens>)`
 
 ### Post-setup session (same day)
 - Mhai2 auto-updated gmail skill to use google-workspace OAuth flow
