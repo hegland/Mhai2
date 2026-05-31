@@ -71,10 +71,33 @@ Located at `~/.hermes/skills/mhai2/`:
 - `gmail/` — Personal Gmail search
 - `backup/` — pCloud backup status
 - `whiteboard/` — Research whiteboard append/render/save
+- `scan-pages/` — Physical document scanning via Canon LiDE 400 (multi-turn workflow)
 
 ```bash
 hermes skills list   # see all skills
 ```
+
+## Scanning Physical Documents (learned 2026-05-31)
+
+Uses the Canon CanoScan LiDE 400 (`escl:http://localhost:60000`) via `scanimage`.
+
+Multi-turn workflow — each Telegram message triggers one page scan:
+
+```
+/scan-pages Scan pages 55 to 64 from the DBT skills training workbook
+→ scans first page immediately, saves state
+
+/scan-pages next   ← repeat for each subsequent page
+```
+
+State persists in `~/.hermes/scan_state.json` between turns. Deleted automatically when complete.
+Output: `~/projects/DBT/scans/dbt_skills_workbook_p055.pdf` etc.
+
+**Key lessons:**
+- Mhai2 ignores skills that conflict with her training ("I can't scan hardware") — always invoke via `/skill-name`, never rely on conversational requests
+- After adding a new skill, delete `~/.hermes/.skills_prompt_snapshot.json` and restart the gateway
+- SOUL.md now has a CRITICAL block overriding the "no hardware access" belief
+- `~/projects/agent/` is read-only (`chmod -R a-w`) — original Mhai, never modify
 
 ## PDF Generation (learned 2026-05-30)
 
@@ -163,6 +186,20 @@ Active skills: 61 (down from 104).
 - Effective average input rate ~$0.28/M; output $4.00/M
 - Fixed monitoring skill with correct formula: cost = uncached*0.80 + cache_read*0.08 + cache_write*1.00 + output*4.00 (all /1M)
 - Never use `sed -i` on config files — wipes them; use Write tool instead
+
+### 2026-05-31
+- Added `scan-pages` skill — physical scanning via Canon LiDE 400 using `scanimage`
+- Designed as stateful multi-turn workflow: `/scan-pages <desc>` then `/scan-pages next` per page
+- State stored in `~/.hermes/scan_state.json`; deleted when job completes
+- Made `~/projects/agent/` read-only (`chmod -R a-w`) — original Mhai, reference only
+- Added CRITICAL block to SOUL.md overriding Mhai2's "no hardware access" belief
+- Learned: Hermes only injects skill name+description into system prompt; full skill loads only on explicit `/skill-name` invocation; conversational requests won't trigger skills that conflict with training
+- Tested and confirmed working end-to-end
+- **Cost diagnosis:** $9/day driven by 37 sessions × cache-write cost ($1.00/M per session start)
+  - Root cause: `project_reset.py` hook firing on false positives ("frank" → FdHMH, "recipe" → Recipes, "backup" → Personal)
+  - Fix: rewrote hook to use word-boundary regex; removed overly generic single-word triggers
+  - Idle timeout already at 4h (`session_reset.idle_minutes: 240`), daily reset at 4am (`at_hour: 4`)
+  - Cache write pricing: $1.00/M (10× more expensive than cache reads at $0.08/M) — minimising session resets is key
 
 ### Post-setup session (same day)
 - Mhai2 auto-updated gmail skill to use google-workspace OAuth flow
