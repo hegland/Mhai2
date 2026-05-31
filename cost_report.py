@@ -86,6 +86,8 @@ def report(days=1):
     print(f"  Cache R  = tokens Anthropic read from cache (not re-sent by us)")
     print(f"  Cache W  = tokens written to Anthropic cache this session")
     print(f"  Token→bytes estimate: {BYTES_PER_TOKEN} bytes/token")
+    print(f"\n  For verified totals (note: Anthropic console uses US time, not AEST):")
+    print(f"  https://platform.claude.com/workspaces/default/cost?model=Claude+Haiku+4.5")
     print(f"{'='*90}\n")
 
 if __name__ == "__main__":
