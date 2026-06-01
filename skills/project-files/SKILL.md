@@ -41,8 +41,10 @@ cp /tmp/<downloaded_file> ~/Desktop/FdHMH/CodeMH/frank_cur_hadamard.m
 - `.m` files are plain text Octave/MATLAB source code — read them with `cat`, save with `cp` or `cat >`
 - `.jl` files are plain text Julia source code — same treatment
 - `.py`, `.txt`, `.md` files — all plain text
-- **Never attempt to re-send a received `.m` or `.jl` file back via Telegram** — Telegram may reject certain file extensions. Instead, confirm receipt by showing the file contents or first few lines.
-- If you need to confirm a `.m` file was received, do: `cat ~/Desktop/FdHMH/CodeMH/filename.m | head -20` and show the output.
+- **When asked to save a file: save it and reply with TEXT ONLY** — the saved path(s). Never send any file back via Telegram unless Markus explicitly asks you to send a file.
+- **Never attempt to re-send received files** — `.m`, `.jl`, `.pdf` or any other type. Telegram may reject them and it is not what was asked.
+- Correct confirmation: "Done. Saved to: ~/Desktop/FdHMH/CodeMH/frank_cur_hadamard.m"
+- Wrong response: trying to send any file attachment back.
 
 ## Read a file
 
