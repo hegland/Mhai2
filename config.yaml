@@ -1,6 +1,6 @@
 model:
-  default: gemini-2.5-flash
-  provider: google-gemini-cli
+  default: gemini-2.5-flash-lite
+  provider: gemini
 providers: {}
 fallback_providers: []
 credential_pool_strategies: {}
@@ -121,23 +121,23 @@ bedrock:
     trace: disabled
 auxiliary:
   vision:
-    provider: google-gemini-cli
-    model: gemini-2.5-flash
+    provider: gemini
+    model: gemini-2.5-flash-lite
     base_url: ''
     api_key: ''
     timeout: 120
     extra_body: {}
     download_timeout: 30
   web_extract:
-    provider: google-gemini-cli
-    model: gemini-2.5-flash
+    provider: gemini
+    model: gemini-2.5-flash-lite
     base_url: ''
     api_key: ''
     timeout: 360
     extra_body: {}
   compression:
-    provider: google-gemini-cli
-    model: gemini-2.5-flash
+    provider: gemini
+    model: gemini-2.5-flash-lite
     base_url: ''
     api_key: ''
     timeout: 120
@@ -199,8 +199,8 @@ auxiliary:
     timeout: 600
     extra_body: {}
   session_search:
-    provider: google-gemini-cli
-    model: gemini-2.5-flash
+    provider: gemini
+    model: gemini-2.5-flash-lite
 display:
   compact: false
   personality: kawaii
