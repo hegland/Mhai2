@@ -1,5 +1,5 @@
 model:
-  default: gemini-2.5-flash-lite
+  default: gemini-2.5-flash
   provider: google-gemini-cli
 providers: {}
 fallback_providers: []
@@ -13,7 +13,7 @@ agent:
   api_max_retries: 3
   service_tier: ''
   tool_use_enforcement: auto
-  task_completion_guidance: true
+  task_completion_guidance: false
   environment_probe: true
   environment_hint: ''
   gateway_timeout_warning: 900
@@ -122,7 +122,7 @@ bedrock:
 auxiliary:
   vision:
     provider: google-gemini-cli
-    model: gemini-2.5-flash-lite
+    model: gemini-2.5-flash
     base_url: ''
     api_key: ''
     timeout: 120
@@ -130,14 +130,14 @@ auxiliary:
     download_timeout: 30
   web_extract:
     provider: google-gemini-cli
-    model: gemini-2.5-flash-lite
+    model: gemini-2.5-flash
     base_url: ''
     api_key: ''
     timeout: 360
     extra_body: {}
   compression:
     provider: google-gemini-cli
-    model: gemini-2.5-flash-lite
+    model: gemini-2.5-flash
     base_url: ''
     api_key: ''
     timeout: 120
@@ -200,7 +200,7 @@ auxiliary:
     extra_body: {}
   session_search:
     provider: google-gemini-cli
-    model: gemini-2.5-flash-lite
+    model: gemini-2.5-flash
 display:
   compact: false
   personality: kawaii
