@@ -29,10 +29,26 @@ Knowledge base root: `~/.openclaw/workspace/knowledge/`
 ## CRITICAL: Project Isolation
 Only access files within the active project's directories. Never read or write files from another project.
 
+## Handling incoming file attachments from Telegram
+
+When Markus sends a file via Telegram, Hermes downloads it to a temporary path and passes it to the skill. To save it to the correct project location:
+
+```bash
+cp /tmp/<downloaded_file> ~/Desktop/FdHMH/CodeMH/frank_cur_hadamard.m
+```
+
+**Important rules for file attachments:**
+- `.m` files are plain text Octave/MATLAB source code — read them with `cat`, save with `cp` or `cat >`
+- `.jl` files are plain text Julia source code — same treatment
+- `.py`, `.txt`, `.md` files — all plain text
+- **Never attempt to re-send a received `.m` or `.jl` file back via Telegram** — Telegram may reject certain file extensions. Instead, confirm receipt by showing the file contents or first few lines.
+- If you need to confirm a `.m` file was received, do: `cat ~/Desktop/FdHMH/CodeMH/filename.m | head -20` and show the output.
+
 ## Read a file
 
 ```bash
 cat ~/Desktop/VRZM26/path/to/file.jl
+cat ~/Desktop/FdHMH/CodeMH/frank_code.m   # .m files are plain text
 ```
 
 For PDFs:
@@ -156,6 +172,8 @@ See `scripts/verify_project.py` for implementation.
 4. **Check existing state:** Always verify available materials before asking questions. Load project-files skill first.
 5. **Git integration:** All research files auto-commit to git on save. Review recent commits to understand project history.
 6. **Meeting prep:** Research projects support weekly meetings. Structure all analysis as meeting-prep docs before code/data work.
+7. **DO NOT create new files unless asked.** If Markus has existing materials (markdown, PDFs, code), reference and use them. Do NOT generate new consolidated documents, wrapper files, or "helper" markdown without explicit permission. This prevents file sprawl and confusion. Exception: temporary files created in `/tmp/` or scripts needed to run existing code are fine.
+8. **Mark current working document in memory.** When Markus says "mark this as the current document", update memory immediately with the file path and short description. This becomes the reference point for all subsequent work in that session/project.
 
 ## Building Algorithm Specifications (FdHMH Weekly Pattern)
 
@@ -204,6 +222,8 @@ pandoc document.md -o document.pdf \
 - Margins `1.5cm`: smaller than default, fits more content while staying readable
 
 **Note:** xelatex may warn about missing Unicode chars (∈, ℝ, superscripts) — warnings are harmless; PDF still renders correctly.
+
+**See also:** `references/markdown-to-pdf-unicode.md` for detailed guide on Unicode handling, font selection, troubleshooting xelatex warnings, and consolidation patterns for bundling analysis + code.
 
 ## Project-Specific References
 
