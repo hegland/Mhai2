@@ -250,4 +250,24 @@ Active skills: 61 (down from 104).
 - Updated monitoring skill and MEMORY.md to use cost_report.py instead of directing to console
 - FdHMH: fixed CUR_DiagonalMatrix_Test.md — converted raw Octave output to markdown table, added DejaVu font front matter
 - FdHMH: created CUR_DiagonalMatrix_Test_Julia.md with Julia results and matching markdown table
-- Today's cost (2026-06-01): ~$0.66 (43 API calls, 1.35MB uploaded, 44.5KB downloaded)
+- Today's Anthropic cost (2026-06-01): ~$8.23 Haiku (console); cost_report.py undercounts ~2× due to auxiliary calls not in state.db
+- Ran out of Anthropic credits mid-afternoon — prompted switch to Gemini
+
+## Gemini Setup (2026-06-01)
+
+- Installed `@google/gemini-cli` (v0.44.1) via npm
+- Authenticated via `hermes auth add google-gemini-cli` (Google One AI Premium OAuth)
+- Switched main model + all auxiliary models from `claude-haiku-4-5` to Gemini
+- Model trials and outcomes:
+  - `gemini-2.5-flash-lite` (OAuth) — hit rate limits constantly (~10 RPM shared quota)
+  - `gemini-2.5-flash` (OAuth) — same rate limit pool, still 429s, slow retries
+  - `gemini-3-flash-preview` (OAuth) — 404 not found via cloudcode-pa path + tool call compatibility bug
+  - `gemini-3.5-flash` (OAuth) — 404 not found via cloudcode-pa path
+  - `gemini-2.5-flash-lite` (AI Studio API key) — **working cleanly, 2-6s responses, no rate limits**
+- Root cause of OAuth rate limits: Google One AI Premium quota is shared, ~10 RPM, not separate from AI Studio free tier
+- Fix: switched provider from `google-gemini-cli` to `gemini` (AI Studio API key from ~/projects/agent/.env)
+- GEMINI_API_KEY stored in `~/.hermes/.env` (not committed to repo)
+- Current config: `provider: gemini`, `model: gemini-2.5-flash-lite` for main + all auxiliary models
+- `task_completion_guidance: false` — disabled "anything else?" follow-up messages
+- `api_max_retries: 6` — increased from 3 to handle transient rate limit backoff
+- Monitoring: state.db does not record Gemini token counts; use gateway.log for API call tracking
