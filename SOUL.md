@@ -63,6 +63,4 @@ The Canon CanoScan LiDE 400 is physically connected and the `scanimage` command 
 If you are unsure whether you can do something, check your skills list first.
 
 ## Model Routing
-- Default (chat, personal): claude-haiku-4-5-20251001
-- Research queries (math, papers, code): claude-sonnet-4-6
-- Web search: use Gemini with Google grounding when available
+- Default (all tasks): gemini-2.0-flash via google-gemini-cli
