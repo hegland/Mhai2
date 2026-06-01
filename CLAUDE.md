@@ -240,3 +240,14 @@ Active skills: 61 (down from 104).
 - Token monitoring via `~/.hermes/state.db` — each API call adds ~60K cache read tokens (system prompt re-read)
 - Cost reduction strategy: (1) fewer skills = smaller system prompt; (2) lightweight stateless bot for simple queries (future work)
 - SOUL.md now tracked in this repo
+- Further skill audit: cut 40 → 35 by archiving minecraft, pokemon, jupyter-live-kernel, openhue, xurl
+- All CUR test scripts (Julia + Octave) updated to output markdown tables directly — output can be pasted into markdown without conversion
+- randnla-algorithm-testing and julia skills updated with markdown table output rule
+- Created `cost_report.py` — shows cost, API calls, upload/download, cache R/W per session in AEST
+  - Usage: `python3 ~/projects/Mhai2/cost_report.py [days] [--all]`
+  - Includes link to Anthropic console (note: console uses US time): https://platform.claude.com/workspaces/default/cost?model=Claude+Haiku+4.5
+- Added `/cost-report` skill — Mhai2 runs cost_report.py directly on request
+- Updated monitoring skill and MEMORY.md to use cost_report.py instead of directing to console
+- FdHMH: fixed CUR_DiagonalMatrix_Test.md — converted raw Octave output to markdown table, added DejaVu font front matter
+- FdHMH: created CUR_DiagonalMatrix_Test_Julia.md with Julia results and matching markdown table
+- Today's cost (2026-06-01): ~$0.66 (43 API calls, 1.35MB uploaded, 44.5KB downloaded)
