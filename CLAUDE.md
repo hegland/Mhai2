@@ -310,6 +310,13 @@ systemctl --user start hermes-dashboard hermes-workspace
 
 **API key fix (applied 2026-06-03):** added `HERMES_API_KEY=<value>` to `~/hermes-workspace/.env` — the key must match `API_SERVER_KEY` in `~/.hermes/.env`.
 
+**Tailscale access (configured 2026-06-03):**
+- URL: `http://100.101.247.30:3000/` (Tailscale IP)
+- Password protected — no username, just the password
+- Password stored in `~/hermes-workspace/.env` as `HERMES_PASSWORD`
+- `HOST=0.0.0.0` set in `~/hermes-workspace/.env` to bind on all interfaces
+- Requires restart after `.env` changes: `systemctl --user restart hermes-workspace`
+
 ### 2026-06-03
 
 #### Gateway startup failure (root cause + fixes)
