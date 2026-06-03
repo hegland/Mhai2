@@ -253,6 +253,27 @@ Active skills: 61 (down from 104).
 - Today's Anthropic cost (2026-06-01): ~$8.23 Haiku (console); cost_report.py undercounts ~2× due to auxiliary calls not in state.db
 - Ran out of Anthropic credits mid-afternoon — prompted switch to Gemini
 
+### 2026-06-03 (continued)
+
+#### Google skills consolidation
+- Archived custom `calendar` and `gmail` skills (in `~/.hermes/skills/mhai2/.archive/`) — superseded by official `google-workspace` skill
+- OAuth already authenticated: `~/.hermes/google_token.json`
+- Created `google-workspace-context` skill (`~/.hermes/skills/mhai2/google-workspace-context/`) with Markus-specific defaults:
+  - Gmail: markus.hegland@gmail.com (ANU Outlook is NOT integrated)
+  - **Mhai Drive folder:** `1uyJNDlqPTQRcCuAHhLK_3fPJXGunJXK8` — default upload target when no folder specified
+  - Drive folder URL: https://drive.google.com/drive/folders/1uyJNDlqPTQRcCuAHhLK_3fPJXGunJXK8
+
+Active Google skills:
+- `google-workspace` (Nous Research) — Gmail, Calendar, Drive, Sheets, Docs, Contacts
+- `google-workspace-context` (mhai2) — Markus-specific defaults and Drive folder
+- `google-workspace-setup` (builtin) — OAuth setup wizard (keep for token re-auth)
+
+Upload a project file to Drive:
+```bash
+GAPI="python3 ${HERMES_HOME:-$HOME/.hermes}/hermes-agent/skills/productivity/google-workspace/scripts/google_api.py"
+$GAPI drive upload /path/to/file --parent 1uyJNDlqPTQRcCuAHhLK_3fPJXGunJXK8
+```
+
 ## Gemini Setup (2026-06-01)
 
 - Installed `@google/gemini-cli` (v0.44.1) via npm
