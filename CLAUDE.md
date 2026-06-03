@@ -263,6 +263,16 @@ Active skills: 61 (down from 104).
   - **Mhai Drive folder:** `1uyJNDlqPTQRcCuAHhLK_3fPJXGunJXK8` — default upload target when no folder specified
   - Drive folder URL: https://drive.google.com/drive/folders/1uyJNDlqPTQRcCuAHhLK_3fPJXGunJXK8
 
+#### Send-file-to-collaborator workflow (tested and working 2026-06-03)
+
+Trigger: "send [filename] to Frank" (or any collaborator)
+
+1. Mhai looks in `~/Desktop/FdHMH/CodeMH/` for the file
+2. Uploads to GDrive `Mhai/FdHMH/` folder via `google-workspace` skill
+3. Replies: "I've saved it to GDrive: [link]. You can attach it to an Outlook email to Frank de Hoog at Frank.DeHoog@csiro.au"
+
+**Key lesson:** SOUL.md prose instructions are unreliable for file operations. Skills need concrete bash commands with full absolute paths — the fdhh skill now has an explicit "Sending Files to Frank" section with copy-paste commands.
+
 Key collaborators added to SOUL.md:
 - Frank de Hoog — Frank.DeHoog@csiro.au — CSIRO, FdHMH RandNLA project — via ANU Outlook (manual)
 
