@@ -263,15 +263,27 @@ Active skills: 61 (down from 104).
   - **Mhai Drive folder:** `1uyJNDlqPTQRcCuAHhLK_3fPJXGunJXK8` — default upload target when no folder specified
   - Drive folder URL: https://drive.google.com/drive/folders/1uyJNDlqPTQRcCuAHhLK_3fPJXGunJXK8
 
+Key collaborators added to SOUL.md:
+- Frank de Hoog — Frank.DeHoog@csiro.au — CSIRO, FdHMH RandNLA project — via ANU Outlook (manual)
+
+Outlook workflow rule added to SOUL.md: when sending files to collaborators, save to GDrive and tell Markus to attach via Outlook. Never use Gmail for work correspondence.
+
+**Note:** SOUL.md changes only take effect in new sessions — send `/new` on Telegram after any SOUL.md update.
+
 Active Google skills:
 - `google-workspace` (Nous Research) — Gmail, Calendar, Drive, Sheets, Docs, Contacts
 - `google-workspace-context` (mhai2) — Markus-specific defaults and Drive folder
 - `google-workspace-setup` (builtin) — OAuth setup wizard (keep for token re-auth)
 
+Google Drive folder structure:
+- `Mhai/` — `1uyJNDlqPTQRcCuAHhLK_3fPJXGunJXK8` — default root
+- `Mhai/FdHMH/` — `17YYxlSTVFYb-vZclqAfvyD3IZbpWoKzy` — FdHMH project files
+
 Upload a project file to Drive:
 ```bash
 GAPI="python3 ${HERMES_HOME:-$HOME/.hermes}/hermes-agent/skills/productivity/google-workspace/scripts/google_api.py"
-$GAPI drive upload /path/to/file --parent 1uyJNDlqPTQRcCuAHhLK_3fPJXGunJXK8
+$GAPI drive upload /path/to/file --parent 17YYxlSTVFYb-vZclqAfvyD3IZbpWoKzy  # FdHMH
+$GAPI drive upload /path/to/file --parent 1uyJNDlqPTQRcCuAHhLK_3fPJXGunJXK8  # root
 ```
 
 ## Gemini Setup (2026-06-01)
