@@ -263,6 +263,27 @@ Active skills: 61 (down from 104).
   - **Mhai Drive folder:** `1uyJNDlqPTQRcCuAHhLK_3fPJXGunJXK8` — default upload target when no folder specified
   - Drive folder URL: https://drive.google.com/drive/folders/1uyJNDlqPTQRcCuAHhLK_3fPJXGunJXK8
 
+#### save-email skill (2026-06-03)
+
+Skill: `~/.hermes/skills/mhai2/save-email/`
+Script: `~/.hermes/skills/mhai2/save-email/scripts/gmail_save.py`
+
+Workflow for getting Outlook emails into a project directory (since ANU Outlook is not integrated):
+
+1. Markus says *"I got an email"* → Mhai2 replies *"Use `/save-email` and I'll walk you through it"*
+2. Markus sends `/save-email`
+3. Mhai2: *"Forward it to markus.hegland@gmail.com with subject **Mhai**, with attachments. Tell me when done."*
+4. Markus forwards and confirms
+5. Mhai2 runs `gmail_save.py --search "subject:Mhai newer_than:1h" --output-dir <project_dir>`
+6. Script saves body (.txt) + attachments to the project directory
+7. Mhai2 checks original sender in email body to confirm correct project directory
+
+**Key lessons:**
+- Gemini won't auto-load skills from conversational hints — must use explicit `/save-email`
+- SOUL.md rule: when Markus says "I got an email", reply "Use `/save-email`" — never ask to paste content
+- `gmail get` doesn't download attachments — `gmail_save.py` handles body + attachments via Gmail API directly
+- gmail_save.py tested and working: found forwarded email, saved body + `Nystrom_CUR2.m` attachment
+
 #### Send-file-to-collaborator workflow (tested and working 2026-06-03)
 
 Trigger: "send [filename] to Frank" (or any collaborator)
