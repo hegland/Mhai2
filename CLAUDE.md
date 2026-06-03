@@ -315,7 +315,10 @@ systemctl --user start hermes-dashboard hermes-workspace
 - Password protected — no username, just the password
 - Password stored in `~/hermes-workspace/.env` as `HERMES_PASSWORD`
 - `HOST=0.0.0.0` set in `~/hermes-workspace/.env` to bind on all interfaces
+- `COOKIE_SECURE=0` set in `~/hermes-workspace/.env` — required for HTTP access (Tailscale is plain HTTP, not HTTPS)
 - Requires restart after `.env` changes: `systemctl --user restart hermes-workspace`
+
+**Tailscale login loop fix:** `NODE_ENV=production` enables the `Secure` cookie flag by default. Browsers silently drop `Secure` cookies over plain HTTP, so the session is never stored and login immediately re-appears. Fix: `COOKIE_SECURE=0` in `~/hermes-workspace/.env`.
 
 ### 2026-06-03
 
