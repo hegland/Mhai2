@@ -271,3 +271,55 @@ Active skills: 61 (down from 104).
 - `task_completion_guidance: false` — disabled "anything else?" follow-up messages
 - `api_max_retries: 6` — increased from 3 to handle transient rate limit backoff
 - Monitoring: state.db does not record Gemini token counts; use gateway.log for API call tracking
+
+## Hermes Workspace (installed 2026-06-02)
+
+Community-built web UI for Hermes Agent (not official NousResearch). Installed at `~/hermes-workspace/` (v2.3.0).
+
+- **URL:** http://localhost:3000
+- **Install location:** `~/hermes-workspace/`
+- **GitHub:** https://github.com/outsourc-e/hermes-workspace
+- **Env config:** `~/hermes-workspace/.env`
+- **Service:** `hermes-workspace.service` (user systemd, bound to hermes-gateway.service)
+
+```bash
+systemctl --user start hermes-workspace
+systemctl --user stop hermes-workspace
+systemctl --user status hermes-workspace
+```
+
+Features: chat interface, terminal, memory editor, 2000+ skills library, file browser, Kanban TaskBoard, multi-agent Swarm Mode, Agent View, MCP, Operations dashboard.
+
+**Note:** The service is bound to hermes-gateway — if the gateway is stopped/restarted aggressively (e.g. multiple rapid restarts), the workspace service also stops. Start it manually with `systemctl --user start hermes-workspace` if needed.
+
+### 2026-06-03
+
+#### Gateway startup failure (root cause + fixes)
+- **Root cause:** Mhai2 switching to the `dbt` project during a session set `~/.hermes/active_profile` to `dbt` persistently. On reboot, `hermes_cli/main.py` reads `active_profile` and overrides `HERMES_HOME` to `~/.hermes/profiles/dbt` even when systemd has set `HERMES_HOME=/home/hegland/.hermes`. The dbt profile directory has no `.env`, so `TELEGRAM_BOT_TOKEN` is never loaded → "No messaging platforms enabled."
+- **Fix 1:** Reset `active_profile` to `default` (`echo default > ~/.hermes/active_profile`)
+- **Fix 2:** systemd drop-in at `~/.config/systemd/user/hermes-gateway.service.d/override.conf` runs `ExecStartPre` to reset `active_profile` to `default` on every gateway start — survives Hermes auto-updates (Hermes only rewrites the main `.service` file, not the `.d/` override directory)
+- **HERMES_HOME override behaviour:** if `HERMES_HOME` points to the hermes root (not a profile dir), `main.py` still reads `active_profile` and overrides it. The root is detected as `Path(HERMES_HOME).parent.name != "profiles"`. Setting `HERMES_HOME` to `/home/hegland/.hermes/profiles/default` would bypass this, but the drop-in approach is simpler.
+
+#### Gateway startup resilience (check_platforms.sh)
+- Added `~/.hermes/hooks/check_platforms.sh` — runs via `ExecStartPost`, waits 8s, kills gateway if Telegram didn't load (triggers systemd auto-restart)
+- Fixed script to use `--since "9 seconds ago"` so it only checks current-run journal entries, not stale entries from previous failed runs
+- Drop-in override also re-adds `ExecStartPost` after Hermes auto-updates wipe the main service file
+- **Hermes auto-updates the service file:** `refresh_systemd_unit_if_needed()` is called at every gateway startup and rewrites the systemd unit if it has changed — always use the `.d/` drop-in for custom additions
+
+#### Tavily web search + hermes-docs skill
+- Added `TAVILY_API_KEY` to `~/.hermes/.env`; set `search_backend: tavily` in config.yaml
+- Created `~/.hermes/skills/mhai2/hermes-docs/` skill — tells Mhai2 where to look for Hermes docs and local source
+- Key doc URL: `https://hermes-agent.nousresearch.com/docs/llms.txt` (LLM-optimised index); `/docs/llms-full.txt` for full docs
+- Note: `/llms.txt` at root returns 404 — correct path is `/docs/llms.txt`
+- Mhai2 must use the browser tool to fetch these URLs, not look for local files
+
+#### Web search toolset missing from Telegram sessions
+- **Root cause:** `web_search` and `web_extract` tools belong to the `web` toolset, which was not listed under `platform_toolsets.telegram` in config.yaml — so Mhai2 had no web search capability in Telegram sessions despite Tavily being configured
+- **Fix:** added `web` to `platform_toolsets.telegram` in config.yaml alongside `hermes-telegram` and `browser`
+- Available search backends: tavily (active), brave-free, ddgs, exa, firecrawl, searxng, parallel, xai
+- **Rule:** whenever adding a new tool capability, check `platform_toolsets` in config.yaml — tools in unloaded toolsets are silently unavailable
+
+#### SOUL.md: Hermes knowledge rule
+- Added CRITICAL section to `~/.hermes/SOUL.md` — Mhai2 must never answer Hermes questions from memory (Gemini has no training data for Hermes)
+- Rule: load `/hermes-docs` skill, fetch `https://hermes-agent.nousresearch.com/docs/llms.txt` via browser, then answer from what is read
+- Also documented that "Hermes Workspace" is a real community project (hermes-workspace.com) not an official NousResearch product
