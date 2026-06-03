@@ -290,7 +290,25 @@ systemctl --user status hermes-workspace
 
 Features: chat interface, terminal, memory editor, 2000+ skills library, file browser, Kanban TaskBoard, multi-agent Swarm Mode, Agent View, MCP, Operations dashboard.
 
-**Note:** The service is bound to hermes-gateway — if the gateway is stopped/restarted aggressively (e.g. multiple rapid restarts), the workspace service also stops. Start it manually with `systemctl --user start hermes-workspace` if needed.
+**Three services must all be running for the workspace to work fully:**
+
+| Service | Port | Purpose |
+|---------|------|---------|
+| `hermes-gateway` | — | Core agent + Telegram |
+| `hermes-dashboard` | 9119 | Rich API endpoints (`/api/model/info`, analytics, logs, cron) |
+| `hermes-workspace` | 3000 | Web UI |
+
+All three are bound to each other — aggressive gateway restarts kill all three. If the workspace shows "Connection error" or "Active Model Offline":
+
+```bash
+systemctl --user start hermes-dashboard hermes-workspace
+```
+
+**"Active Model Offline"** means `hermes-dashboard` is down (port 9119 not listening). The workspace fetches `/api/model/info` from the dashboard, not from the API server (8642).
+
+**"Cannot read properties of undefined (reading 'map')"** means the workspace can't connect to the Hermes API server. Check `~/hermes-workspace/.env` has `HERMES_API_KEY` matching `API_SERVER_KEY` in `~/.hermes/.env`.
+
+**API key fix (applied 2026-06-03):** added `HERMES_API_KEY=<value>` to `~/hermes-workspace/.env` — the key must match `API_SERVER_KEY` in `~/.hermes/.env`.
 
 ### 2026-06-03
 
