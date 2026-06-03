@@ -283,6 +283,7 @@ Workflow for getting Outlook emails into a project directory (since ANU Outlook 
 - SOUL.md rule: when Markus says "I got an email", reply "Use `/save-email`" — never ask to paste content
 - `gmail get` doesn't download attachments — `gmail_save.py` handles body + attachments via Gmail API directly
 - gmail_save.py tested and working: found forwarded email, saved body + `Nystrom_CUR2.m` attachment
+- Known limitation: email currently saved to `CodeMH/` regardless of content type. Future improvement: route code files → CodeMH, general correspondence → FdHMH/emails/
 
 #### Send-file-to-collaborator workflow (tested and working 2026-06-03)
 
