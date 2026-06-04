@@ -135,7 +135,17 @@ def main():
         print(json.dumps({"action": "allow"}))
         return
 
-    text = payload.get("text", "").strip()
+    # text is in payload["text"] for old format, or payload["extra"]["event"]["text"]
+    # for the real gateway shell-hook wire format
+    text = payload.get("text", "")
+    if not text:
+        extra = payload.get("extra", {})
+        event_obj = extra.get("event", {})
+        if hasattr(event_obj, "text"):
+            text = event_obj.text or ""
+        elif isinstance(event_obj, dict):
+            text = event_obj.get("text", "")
+    text = text.strip()
     cmd = text.split()[0].lower() if text.startswith("/") else ""
 
     # Tier 1: handle known commands directly without invoking the LLM
@@ -144,13 +154,13 @@ def main():
         _sys.path.insert(0, str(Path.home() / ".hermes" / "hooks"))
         from tier1_commands import handle as tier1_handle
         if tier1_handle(text):
-            print(json.dumps({"action": "skip"}))
+            print(json.dumps({"action": "skip", "reason": "tier1"}))
             return
     except Exception as e:
-        # Log the error to a file for debugging
         with open(Path.home() / ".hermes" / "logs" / "tier1_errors.log", "a") as f:
-            f.write(f"tier1 error: {e}\ntext: {text}\n\n")
-        pass  # if tier1 fails, fall through to normal dispatch
+            import traceback
+            f.write(f"tier1 error: {e}\ntext: {text}\n{traceback.format_exc()}\n\n")
+        pass
 
     # /new: report cost, clear project state, then allow Hermes to handle the reset
     if cmd == "/new":
