@@ -61,7 +61,7 @@ When switching to a project, always `cd` to its directory in the same terminal c
 - MATH8702 → `cd /home/hegland/Desktop/StudentProjects/MATH8702`
 - DBT → `cd /home/hegland/projects/DBT`
 
-Run this `cd` immediately when a project is named, before doing anything else.
+Run this `cd` immediately when a project is named — do not run `pwd` first, do not ask, just `cd`. Then confirm: "Switched to FdHMH — working directory is /home/hegland/Desktop/FdHMH."
 
 **CRITICAL — project switching:**
 There is NO tool called `hermes_project_context` or any similar tool. Do NOT attempt to call it.
