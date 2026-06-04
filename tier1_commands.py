@@ -322,6 +322,71 @@ def cmd_ocr(args: str) -> None:
             send_text(f"Error OCR'ing {pdf.name}: {e}")
 
 
+def cmd_member_status(args: str) -> None:
+    """Check ACT Swiss Club membership status. Searches membership CSV.
+
+    !member-status           — check your own status
+    !member-status <name>    — check someone else's status
+    """
+    import csv
+    from datetime import datetime
+
+    # Find membership CSV in ACT-Swiss-Club
+    membership_csv = Path.home() / "projects" / "ACT-Swiss-Club" / "data" / "MASTER - Canberra Swiss Club Membership - CURRENT.csv"
+    if not membership_csv.exists():
+        send_text(f"Membership file not found: {membership_csv}")
+        return
+
+    # If no args, search for Markus Hegland
+    search_name = args.strip() if args.strip() else "Markus Hegland"
+
+    try:
+        with open(membership_csv, newline='', encoding='utf-8-sig') as f:
+            reader = csv.DictReader(f)
+            found = False
+            for row in reader:
+                surname = row.get('Surname', '').strip()
+                name = row.get('Name', '').strip()
+                full_name = f"{surname} {name}".strip()
+
+                # Match: either full name or search term appears in full name
+                if search_name.lower() in full_name.lower() or full_name.lower() == search_name.lower():
+                    found = True
+                    mem_year = row.get('MemYear', '?').strip()
+                    mem_type = row.get('Membership Type', '?').strip()
+                    class_mem = row.get('Class of Membership', '?').strip()
+                    send_to = row.get('Send updates and Newsletters to - those marked with an option have up todate memberships.', '?').strip()
+                    date_joined = row.get('Date Joined', '').strip()
+                    date_ended = row.get('Date Ended', '').strip()
+                    email = row.get('Email', '').strip()
+
+                    # Determine financial status
+                    current_year = datetime.now().year
+                    is_financial = mem_year in (str(current_year), str(current_year - 1)) and send_to
+                    status_emoji = "✓" if is_financial else "✗"
+
+                    msg = f"{status_emoji} **{full_name}**\n"
+                    msg += f"Membership year: {mem_year}\n"
+                    msg += f"Type: {mem_type}\n"
+                    msg += f"Class: {class_mem}\n"
+                    msg += f"Status: {'✓ Current/Paid' if is_financial else '✗ Not current'}\n"
+                    if date_joined:
+                        msg += f"Joined: {date_joined}\n"
+                    if date_ended:
+                        msg += f"Ended: {date_ended}\n"
+                    if email:
+                        msg += f"Email: {email}"
+
+                    send_text(msg)
+                    return
+
+            if not found:
+                send_text(f"Not found in membership list: {search_name}")
+
+    except Exception as e:
+        send_text(f"Error reading membership file: {e}")
+
+
 def cmd_scan_pages(args: str) -> None:
     args = args.strip()
 
@@ -460,14 +525,15 @@ def _scan_status() -> None:
 # ============================================================================
 
 TIER1_COMMANDS = {
-    "pwd":   cmd_pwd,
-    "ls":    cmd_ls,
-    "cat":   cmd_cat,
-    "send":  cmd_send,
-    "plots": cmd_plots,
-    "run":   cmd_run,
-    "sc":    cmd_scan_pages,   # !sc — scan pages
-    "ocr":   cmd_ocr,          # !ocr — OCR scanned PDFs to markdown (tesseract, no LLM)
+    "pwd":           cmd_pwd,
+    "ls":            cmd_ls,
+    "cat":           cmd_cat,
+    "send":          cmd_send,
+    "plots":         cmd_plots,
+    "run":           cmd_run,
+    "sc":            cmd_scan_pages,      # !sc — scan pages
+    "ocr":           cmd_ocr,             # !ocr — OCR scanned PDFs to markdown (tesseract, no LLM)
+    "member-status": cmd_member_status,   # !member-status — check ACT Swiss Club membership status
 }
 
 
