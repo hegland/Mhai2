@@ -342,6 +342,9 @@ def cmd_member_status(args: str) -> None:
 
     try:
         with open(membership_csv, newline='', encoding='utf-8-sig') as f:
+            # Skip metadata rows (first 3 lines) — header is on line 4
+            for _ in range(3):
+                f.readline()
             reader = csv.DictReader(f)
             found = False
             for row in reader:
