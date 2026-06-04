@@ -150,19 +150,11 @@ def main():
     text = text.strip()
     cmd = text.split()[0].lower() if text.startswith("/") else ""
 
-    # Tier 1: handle known commands directly without invoking the LLM
-    try:
-        import sys as _sys
-        _sys.path.insert(0, str(Path.home() / ".hermes" / "hooks"))
-        from tier1_commands import handle as tier1_handle
-        if tier1_handle(text):
-            print(json.dumps({"action": "skip", "reason": "tier1"}))
-            return
-    except Exception as e:
-        with open(Path.home() / ".hermes" / "logs" / "tier1_errors.log", "a") as f:
-            import traceback
-            f.write(f"tier1 error: {e}\ntext: {text}\n{traceback.format_exc()}\n\n")
-        pass
+    # NOTE: Tier 1 '!' commands are handled by the tier1 Python plugin
+    # (~/.hermes/plugins/tier1/), NOT here. Shell hooks cannot return a
+    # working "skip" action (shell_hooks.py _parse_response drops it for
+    # pre_gateway_dispatch), so the interception must be a Python plugin.
+    # This shell hook only handles project-switch side effects below.
 
     # /new: report cost, clear project state, then allow Hermes to handle the reset
     if cmd == "/new":

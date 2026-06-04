@@ -1,0 +1,7 @@
+name: tier1
+kind: standalone
+description: >
+  Tier 1 command handler — intercepts ! commands (!ls, !cat, !pwd, !send,
+  !plots, !run, !sc) and executes them directly via shell without invoking
+  the LLM. Bypasses Gemini entirely for deterministic file/scan operations.
+version: "1.0"

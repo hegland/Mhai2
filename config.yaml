@@ -388,6 +388,10 @@ command_allowlist:
 - shell command via -c/-lc flag
 - script execution via -e/-c flag
 quick_commands: {}
+plugins:
+  enabled:
+  - hermes-achievements
+  - tier1
 hooks:
   pre_gateway_dispatch:
   - command: python3 /home/hegland/.hermes/hooks/project_reset.py
