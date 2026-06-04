@@ -322,6 +322,62 @@ def cmd_ocr(args: str) -> None:
             send_text(f"Error OCR'ing {pdf.name}: {e}")
 
 
+def cmd_club_info(args: str) -> None:
+    """Show ACT Swiss Club quick reference info. Reads QUICK_REFERENCE.md.
+
+    !club-info           — show all club info
+    !club-info membership — show membership rates and renewal form
+    !club-info events    — show upcoming events and registration forms
+    !club-info fondue    — show fondue registration
+    """
+    ref_file = Path.home() / "projects" / "ACT-Swiss-Club" / "QUICK_REFERENCE.md"
+    if not ref_file.exists():
+        send_text(f"Club reference file not found: {ref_file}")
+        return
+
+    try:
+        content = ref_file.read_text()
+        topic = args.strip().lower() if args.strip() else ""
+
+        if topic == "membership":
+            # Extract membership section
+            lines = content.split('\n')
+            in_section = False
+            section_lines = []
+            for line in lines:
+                if '## 2026 Membership' in line:
+                    in_section = True
+                elif in_section and line.startswith('## '):
+                    break
+                elif in_section:
+                    section_lines.append(line)
+            send_text('\n'.join(section_lines[:15]).strip())
+
+        elif topic == "events":
+            # Extract events section
+            lines = content.split('\n')
+            in_section = False
+            section_lines = []
+            for line in lines:
+                if '## Upcoming Events' in line:
+                    in_section = True
+                elif in_section and line.startswith('## '):
+                    break
+                elif in_section:
+                    section_lines.append(line)
+            send_text('\n'.join(section_lines[:20]).strip())
+
+        elif topic == "fondue":
+            send_text("🫕 **Fondue Night — June 2026**\n\nRegistration form:\nhttps://docs.google.com/forms/d/e/1FAIpQLScn88J3U6jvMyOAWF0DEO2jfZtbWz22H-QlNuhjHMBmEJPtHA/viewform\n\nFor details: canberraswissclub@gmail.com")
+
+        else:
+            # Show full reference (first 1500 chars)
+            send_text(content[:1500] + "\n...\n[Use: !club-info membership | events | fondue]")
+
+    except Exception as e:
+        send_text(f"Error reading club info: {e}")
+
+
 def cmd_member_status(args: str) -> None:
     """Check ACT Swiss Club membership status. Searches membership CSV.
 
@@ -541,6 +597,7 @@ TIER1_COMMANDS = {
     "run":           cmd_run,
     "sc":            cmd_scan_pages,      # !sc — scan pages
     "ocr":           cmd_ocr,             # !ocr — OCR scanned PDFs to markdown (tesseract, no LLM)
+    "club-info":     cmd_club_info,       # !club-info — ACT Swiss Club quick reference (rates, events, forms)
     "member-status": cmd_member_status,   # !member-status — check ACT Swiss Club membership status
 }
 

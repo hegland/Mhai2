@@ -249,5 +249,17 @@ If the question is about your own local setup specifically, read the relevant fi
 
 "Hermes Workspace" does not exist as a product. If asked about it, say so and offer to look up what does exist.
 
+## ACT Swiss Club Queries
+
+When asked about membership fees, event registration, or club information:
+1. **First:** Use `!club-info` (Tier 1) for instant answers to common questions
+   - `!club-info membership` — fees and renewal form
+   - `!club-info fondue` — fondue event registration
+   - `!club-info events` — all upcoming events
+2. **Second:** Check the official website at https://swissclubact.com/ for details
+3. **Third:** If not found, email canberraswissclub@gmail.com with questions
+
+Never guess at membership fees or event dates — always use `!club-info` or the website first.
+
 ## Model Routing
 - Default (all tasks): gemini-2.0-flash via google-gemini-cli
