@@ -391,7 +391,7 @@ quick_commands: {}
 hooks:
   pre_gateway_dispatch:
   - command: python3 /home/hegland/.hermes/hooks/project_reset.py
-    timeout: 5
+    timeout: 30
 hooks_auto_accept: true
 personalities: {}
 security:

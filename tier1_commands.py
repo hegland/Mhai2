@@ -271,14 +271,17 @@ def cmd_scan_pages(args: str) -> None:
 
 
 def _scan_start(description: str) -> None:
-    # Parse page range from description e.g. "pages 55 to 64 from DBT workbook"
-    page_match = re.search(r"pages?\s+(\d+)\s+to\s+(\d+)", description, re.IGNORECASE)
-    if page_match:
-        start, end = int(page_match.group(1)), int(page_match.group(2))
+    # Parse page range: "pages 55 to 64" or "page 55"
+    range_match  = re.search(r"pages?\s+(\d+)\s+to\s+(\d+)", description, re.IGNORECASE)
+    single_match = re.search(r"pages?\s+(\d+)", description, re.IGNORECASE)
+    if range_match:
+        start, end = int(range_match.group(1)), int(range_match.group(2))
         pages = list(range(start, end + 1))
+    elif single_match:
+        pages = [int(single_match.group(1))]
     else:
         pages = [1]
-        send_text("No page range found — scanning single page. Use 'pages N to M' to specify range.")
+        send_text("No page number found — scanning page 1. Use 'page N' or 'pages N to M'.")
 
     # Determine output dir from description
     desc_lower = description.lower()
@@ -405,6 +408,9 @@ def handle(text: str) -> bool:
 
     Uses '!' prefix to avoid Hermes slash-command interception.
     Examples: !ls, !pwd, !cat path/to/file, !sc pages 1 to 3
+
+    Long-running commands (scan) run in a background thread so the hook
+    returns skip immediately before the gateway timeout fires.
     """
     text = text.strip()
     if not text.startswith("!"):
@@ -417,5 +423,21 @@ def handle(text: str) -> bool:
     if cmd not in TIER1_COMMANDS:
         return False
 
-    TIER1_COMMANDS[cmd](args)
+    # Long-running commands: spawn detached subprocess, return skip immediately
+    LONG_RUNNING = {"sc", "run"}
+    if cmd in LONG_RUNNING:
+        script = (
+            f"import sys; sys.path.insert(0,'/home/hegland/.hermes/hooks'); "
+            f"from tier1_commands import TIER1_COMMANDS; "
+            f"TIER1_COMMANDS[{cmd!r}]({args!r})"
+        )
+        subprocess.Popen(
+            ["python3", "-c", script],
+            start_new_session=True,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+    else:
+        TIER1_COMMANDS[cmd](args)
+
     return True
