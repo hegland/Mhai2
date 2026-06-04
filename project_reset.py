@@ -147,6 +147,9 @@ def main():
             print(json.dumps({"action": "skip"}))
             return
     except Exception as e:
+        # Log the error to a file for debugging
+        with open(Path.home() / ".hermes" / "logs" / "tier1_errors.log", "a") as f:
+            f.write(f"tier1 error: {e}\ntext: {text}\n\n")
         pass  # if tier1 fails, fall through to normal dispatch
 
     # /new: report cost, clear project state, then allow Hermes to handle the reset

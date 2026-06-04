@@ -388,13 +388,13 @@ def _scan_status() -> None:
 # ============================================================================
 
 TIER1_COMMANDS = {
-    "pwd":        cmd_pwd,
-    "ls":         cmd_ls,
-    "cat":        cmd_cat,
-    "send":       cmd_send,
-    "plots":      cmd_plots,
-    "run":        cmd_run,
-    "scan-pages": cmd_scan_pages,
+    "pwd":   cmd_pwd,
+    "ls":    cmd_ls,
+    "cat":   cmd_cat,
+    "send":  cmd_send,
+    "plots": cmd_plots,
+    "run":   cmd_run,
+    "sc":    cmd_scan_pages,   # /sc instead of /scan-pages to avoid Hermes skill rewrite
 }
 
 
