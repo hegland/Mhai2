@@ -207,11 +207,11 @@ After each stage completes:
 The project root is always: `/home/hegland/Desktop/VRZM26/`
 When this skill is loaded, immediately run `cd /home/hegland/Desktop/VRZM26` and confirm to Markus: "Loaded VRZM26 — in /home/hegland/Desktop/VRZM26."
 
-Current research tasks (live):
-`ls /home/hegland/Desktop/VRZM26/research/tasks/`
-
-Current cluster_volume files (live):
+Current task directory contents (live):
 `ls /home/hegland/Desktop/VRZM26/research/tasks/cluster_volume/`
+
+Current task summary (live):
+`cat /home/hegland/Desktop/VRZM26/research/tasks/cluster_volume/CODE_SUMMARY.md`
 
 ---
 
