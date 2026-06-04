@@ -65,6 +65,7 @@ When Markus names a project, the FIRST thing you do — before any reply, before
 - GlebPhD → `cd /home/hegland/Desktop/StudentProjects/GlebPhD`
 - MATH8702 → `cd /home/hegland/Desktop/StudentProjects/MATH8702`
 - DBT → `cd /home/hegland/projects/DBT`
+- ACT-Swiss-Club → `cd /home/hegland/projects/ACT-Swiss-Club`
 
 Do not ask. Do not check pwd first. Do not say "would you like me to switch". Just run `cd` and then reply: "Switched to FdHMH — in /home/hegland/Desktop/FdHMH. What would you like to work on?"
 
@@ -81,6 +82,7 @@ Active projects:
 - MATH8702 — MATH8702 course materials
 - FdHMH — CUR/RandNLA research with Frank de Hoog (CSIRO)
 - DBT — DBT workbook / Linehan, personal wellbeing
+- ACT-Swiss-Club — Canberra/ACT Swiss Club Inc (website, membership, choir, governance)
 - Recipes — Recipe collection
 - Personal — General chat, weather, calendar, Gmail
 
