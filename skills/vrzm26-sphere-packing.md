@@ -207,11 +207,11 @@ After each stage completes:
 The project root is always: `/home/hegland/Desktop/VRZM26/`
 Never use `~` — always use the full path above.
 
-First thing every session:
-```bash
-ls /home/hegland/Desktop/VRZM26/research/tasks/
-cat /home/hegland/Desktop/VRZM26/research/tasks/cluster_volume/CODE_SUMMARY.md
-```
+Current research tasks (live):
+`ls /home/hegland/Desktop/VRZM26/research/tasks/`
+
+Current cluster_volume files (live):
+`ls /home/hegland/Desktop/VRZM26/research/tasks/cluster_volume/`
 
 ---
 
