@@ -402,14 +402,17 @@ def handle(text: str) -> bool:
     """
     Try to handle text as a Tier 1 command.
     Returns True if handled (caller should return skip), False otherwise.
+
+    Uses '!' prefix to avoid Hermes slash-command interception.
+    Examples: !ls, !pwd, !cat path/to/file, !sc pages 1 to 3
     """
     text = text.strip()
-    if not text.startswith("/"):
+    if not text.startswith("!"):
         return False
 
-    parts    = text[1:].split(None, 1)
-    cmd      = parts[0].lower()
-    args     = parts[1] if len(parts) > 1 else ""
+    parts = text[1:].split(None, 1)
+    cmd   = parts[0].lower()
+    args  = parts[1] if len(parts) > 1 else ""
 
     if cmd not in TIER1_COMMANDS:
         return False
