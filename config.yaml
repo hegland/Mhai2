@@ -27,7 +27,7 @@ agent:
 terminal:
   backend: local
   modal_mode: auto
-  cwd: .
+  cwd: /home/hegland/Desktop/VRZM26
   timeout: 180
   env_passthrough: []
   shell_init_files: []
