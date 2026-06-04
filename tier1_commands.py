@@ -338,7 +338,7 @@ def cmd_member_status(args: str) -> None:
         return
 
     # If no args, search for Markus Hegland
-    search_name = args.strip() if args.strip() else "Markus Hegland"
+    search_term = args.strip() if args.strip() else "Markus"
 
     try:
         with open(membership_csv, newline='', encoding='utf-8-sig') as f:
@@ -347,10 +347,15 @@ def cmd_member_status(args: str) -> None:
             for row in reader:
                 surname = row.get('Surname', '').strip()
                 name = row.get('Name', '').strip()
-                full_name = f"{surname} {name}".strip()
+                full_name_fwd = f"{surname} {name}".strip()   # Hegland Markus
+                full_name_rev = f"{name} {surname}".strip()   # Markus Hegland
 
-                # Match: either full name or search term appears in full name
-                if search_name.lower() in full_name.lower() or full_name.lower() == search_name.lower():
+                # Match: search term in surname, name, or either full name order
+                search_lower = search_term.lower()
+                if (search_lower == surname.lower() or
+                    search_lower == name.lower() or
+                    search_lower in full_name_fwd.lower() or
+                    search_lower in full_name_rev.lower()):
                     found = True
                     mem_year = row.get('MemYear', '?').strip()
                     mem_type = row.get('Membership Type', '?').strip()
@@ -365,7 +370,7 @@ def cmd_member_status(args: str) -> None:
                     is_financial = mem_year in (str(current_year), str(current_year - 1)) and send_to
                     status_emoji = "✓" if is_financial else "✗"
 
-                    msg = f"{status_emoji} **{full_name}**\n"
+                    msg = f"{status_emoji} **{full_name_fwd}**\n"
                     msg += f"Membership year: {mem_year}\n"
                     msg += f"Type: {mem_type}\n"
                     msg += f"Class: {class_mem}\n"
@@ -381,7 +386,7 @@ def cmd_member_status(args: str) -> None:
                     return
 
             if not found:
-                send_text(f"Not found in membership list: {search_name}")
+                send_text(f"Not found in membership list: {search_term}")
 
     except Exception as e:
         send_text(f"Error reading membership file: {e}")
