@@ -138,11 +138,12 @@ def main():
     text = payload.get("text", "").strip()
     cmd = text.split()[0].lower() if text.startswith("/") else ""
 
-    # /new: report cost then allow Hermes to handle the reset normally
+    # /new: report cost, clear project state, then allow Hermes to handle the reset
     if cmd == "/new":
         summary = session_cost_summary()
         if summary:
             send_telegram(summary)
+        STATE_FILE.unlink(missing_ok=True)
         print(json.dumps({"action": "allow"}))
         return
 
