@@ -253,6 +253,75 @@ def cmd_run(args: str) -> None:
         send_text(f"Error running {script_name}: {e}")
 
 
+def _ocr_pdf_to_markdown(pdf_path: Path) -> str:
+    """OCR a (possibly multi-page) PDF to markdown text using pdftoppm + tesseract."""
+    import tempfile
+    md_parts = []
+    with tempfile.TemporaryDirectory() as tmp:
+        prefix = os.path.join(tmp, "page")
+        # Convert each PDF page to a PNG at 300 DPI
+        subprocess.run(
+            ["pdftoppm", "-r", "300", "-png", str(pdf_path), prefix],
+            capture_output=True, timeout=120)
+        pngs = sorted(Path(tmp).glob("page*.png"))
+        for i, png in enumerate(pngs, 1):
+            result = subprocess.run(
+                ["tesseract", str(png), "stdout"],
+                capture_output=True, text=True, timeout=120)
+            text = result.stdout.strip()
+            # Light cleanup: normalise smart quotes and common artefacts
+            text = (text.replace("“", '"').replace("”", '"')
+                        .replace("‘", "'").replace("’", "'")
+                        .replace("—", "--"))
+            if len(pngs) > 1:
+                md_parts.append(f"## Page {i}\n\n{text}")
+            else:
+                md_parts.append(text)
+    return "\n\n---\n\n".join(md_parts)
+
+
+def cmd_ocr(args: str) -> None:
+    """OCR scanned PDF(s) to markdown. Tier 1 — local tesseract, no LLM.
+
+    !ocr <file.pdf>  — OCR one PDF
+    !ocr             — OCR all PDFs in the current project's scans/ dir lacking a .md
+    """
+    targets = []
+    if args.strip():
+        p = resolve_path(args.strip())
+        if not p.exists():
+            send_text(f"File not found: {p}")
+            return
+        targets = [p]
+    else:
+        project_dir = current_project_dir()
+        if not project_dir:
+            send_text("No project set. Use: !ocr <path-to-pdf>")
+            return
+        scans_dir = project_dir / "scans"
+        if not scans_dir.exists():
+            send_text(f"No scans directory in {project_dir}")
+            return
+        # all PDFs without a matching .md
+        targets = [p for p in sorted(scans_dir.glob("*.pdf"))
+                   if not p.with_suffix(".md").exists()]
+        if not targets:
+            send_text(f"No un-OCR'd PDFs in {scans_dir}")
+            return
+
+    send_text(f"OCR'ing {len(targets)} PDF(s) with tesseract (no LLM)...")
+    for pdf in targets:
+        try:
+            md = _ocr_pdf_to_markdown(pdf)
+            md_path = pdf.with_suffix(".md")
+            md_path.write_text(f"# {pdf.stem}\n\n{md}\n")
+            send_text(f"✓ {pdf.name} → {md_path.name} ({len(md)} chars)")
+        except subprocess.TimeoutExpired:
+            send_text(f"⏱ OCR timed out on {pdf.name}")
+        except Exception as e:
+            send_text(f"Error OCR'ing {pdf.name}: {e}")
+
+
 def cmd_scan_pages(args: str) -> None:
     args = args.strip()
 
@@ -397,7 +466,8 @@ TIER1_COMMANDS = {
     "send":  cmd_send,
     "plots": cmd_plots,
     "run":   cmd_run,
-    "sc":    cmd_scan_pages,   # /sc instead of /scan-pages to avoid Hermes skill rewrite
+    "sc":    cmd_scan_pages,   # !sc — scan pages
+    "ocr":   cmd_ocr,          # !ocr — OCR scanned PDFs to markdown (tesseract, no LLM)
 }
 
 
@@ -424,7 +494,7 @@ def handle(text: str) -> bool:
         return False
 
     # Long-running commands: spawn detached subprocess, return skip immediately
-    LONG_RUNNING = {"sc", "run"}
+    LONG_RUNNING = {"sc", "run", "ocr"}
     if cmd in LONG_RUNNING:
         script = (
             f"import sys; sys.path.insert(0,'/home/hegland/.hermes/hooks'); "
