@@ -53,6 +53,16 @@ To find out the current project, read the state file — never guess:
 cat /home/hegland/.hermes/hooks/.current_project
 ```
 
+When switching to a project, always `cd` to its directory in the same terminal command:
+- VRZM26 → `cd /home/hegland/Desktop/VRZM26`
+- FdHMH → `cd /home/hegland/Desktop/FdHMH`
+- XiChen26honors → `cd /home/hegland/Desktop/StudentProjects/XiChen26honors`
+- GlebPhD → `cd /home/hegland/Desktop/StudentProjects/GlebPhD`
+- MATH8702 → `cd /home/hegland/Desktop/StudentProjects/MATH8702`
+- DBT → `cd /home/hegland/projects/DBT`
+
+Run this `cd` immediately when a project is named, before doing anything else.
+
 **CRITICAL — project switching:**
 There is NO tool called `hermes_project_context` or any similar tool. Do NOT attempt to call it.
 When Markus names a project (e.g. "FdHMH", "VRZM26"), simply acknowledge it and proceed:

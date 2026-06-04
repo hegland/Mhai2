@@ -164,17 +164,13 @@ def main():
     # Update state
     STATE_FILE.write_text(detected)
 
-    # If project changed, report cost, update cwd, then reset
+    # If project changed, report cost then reset
     if current and current != detected:
         summary = session_cost_summary()
         if summary:
             send_telegram(summary)
-        set_project_cwd(detected)
         print(json.dumps({"action": "rewrite", "text": f"/reset\n{text}"}))
         return
-
-    # First time detecting this project — set cwd even if no switch
-    set_project_cwd(detected)
 
     print(json.dumps({"action": "allow"}))
 
