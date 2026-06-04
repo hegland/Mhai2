@@ -135,16 +135,18 @@ def main():
         print(json.dumps({"action": "allow"}))
         return
 
-    # text is in payload["text"] for old format, or payload["extra"]["event"]["text"]
-    # for the real gateway shell-hook wire format
+    # text is in payload["text"] for direct test calls, or embedded in
+    # payload["extra"]["event"] as a serialised MessageEvent string for real gateway calls
     text = payload.get("text", "")
     if not text:
         extra = payload.get("extra", {})
-        event_obj = extra.get("event", {})
-        if hasattr(event_obj, "text"):
-            text = event_obj.text or ""
-        elif isinstance(event_obj, dict):
-            text = event_obj.get("text", "")
+        event_str = str(extra.get("event", ""))
+        # Extract from MessageEvent(text='...', ...) string representation
+        m = re.search(r"MessageEvent\(text='(.*?)',", event_str)
+        if m:
+            text = m.group(1)
+        elif isinstance(extra.get("event"), dict):
+            text = extra["event"].get("text", "")
     text = text.strip()
     cmd = text.split()[0].lower() if text.startswith("/") else ""
 
