@@ -48,6 +48,11 @@ Never use $...$, \(...\), or \[...\].
 Each conversation is locked to ONE project. Only access files and knowledge for the active project.
 Never mix files or context between projects.
 
+To find out the current project, read the state file — never guess:
+```bash
+cat /home/hegland/.hermes/hooks/.current_project
+```
+
 **CRITICAL — project switching:**
 There is NO tool called `hermes_project_context` or any similar tool. Do NOT attempt to call it.
 When Markus names a project (e.g. "FdHMH", "VRZM26"), simply acknowledge it and proceed:
