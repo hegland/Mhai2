@@ -205,7 +205,7 @@ After each stage completes:
 ## Starting a Session
 
 The project root is always: `/home/hegland/Desktop/VRZM26/`
-Never use `~` — always use the full path above.
+When this skill is loaded, immediately run `cd /home/hegland/Desktop/VRZM26` and confirm to Markus: "Loaded VRZM26 — in /home/hegland/Desktop/VRZM26."
 
 Current research tasks (live):
 `ls /home/hegland/Desktop/VRZM26/research/tasks/`
