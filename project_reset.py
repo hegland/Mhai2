@@ -138,6 +138,17 @@ def main():
     text = payload.get("text", "").strip()
     cmd = text.split()[0].lower() if text.startswith("/") else ""
 
+    # Tier 1: handle known commands directly without invoking the LLM
+    try:
+        import sys as _sys
+        _sys.path.insert(0, str(Path.home() / ".hermes" / "hooks"))
+        from tier1_commands import handle as tier1_handle
+        if tier1_handle(text):
+            print(json.dumps({"action": "skip"}))
+            return
+    except Exception as e:
+        pass  # if tier1 fails, fall through to normal dispatch
+
     # /new: report cost, clear project state, then allow Hermes to handle the reset
     if cmd == "/new":
         summary = session_cost_summary()
