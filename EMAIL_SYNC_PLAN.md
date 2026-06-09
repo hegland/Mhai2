@@ -68,6 +68,10 @@ Projects care about **research email only**, not social/logistics (coffee, lunch
   admin-about-Gleb → `+gleb` → `Collab/Gleb`); the content scope keeps other
   students out. Worked example (GlebPhD): convenor `James.Tener@anu.edu.au` + HDR
   functional mailbox `hdr.css@anu.edu.au`, scoped with `(gleb OR shabernev)`.
+  **Admin contacts are program-specific** — HDR/PhD (James Tener + `hdr.css`) is a
+  DIFFERENT structure from Honours. Honours (XiChen26honors): formal convenor Joan
+  Licata + active coordinator Galina Levitina; the HDR people do NOT apply. Always
+  match the admin layer to the program level.
 
 ### Gotchas learned
 - People use **several addresses**; each `from:(…)` filter needs an OR-list of
