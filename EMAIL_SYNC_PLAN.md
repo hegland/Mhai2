@@ -83,8 +83,8 @@ Projects care about **research email only**, not social/logistics (coffee, lunch
 | VRZM26 | Vanessa Robins | research-dominant | ✅ recorded |
 | VRZM26 | Conrad Burden | mixed (mostly social) | ✅ recorded |
 | FdHMH | Frank de Hoog | research-dominant (~203/yr) | ✅ recorded |
-| GlebPhD | Gleb | ? | ⏳ awaiting Copilot response |
-| XiChen26honors | Xi Chen | ? | ⏳ awaiting Copilot response |
+| GlebPhD | Gleb Shabernev | research-dominant (assumed) | ✅ recorded — profile TBC via Copilot |
+| XiChen26honors | Xi Chen | research-dominant (assumed) | ✅ recorded |
 
 ## Roadmap
 
