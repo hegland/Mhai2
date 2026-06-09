@@ -47,7 +47,7 @@ Routed into the student's own bucket. Admin is **program-specific** (HDR ≠ hon
 | Project | Role | Person / mailbox | Content-scoped `from:(…) AND (…)` filter | Routes to |
 |---------|------|------------------|------------------------------------------|-----------|
 | GlebPhD (HDR/PhD) | Convenor + HDR admin | `James.Tener@anu.edu.au`, `hdr.css@anu.edu.au` | `from:(James.Tener@anu.edu.au OR hdr.css@anu.edu.au) AND (gleb OR shabernev)` | `+gleb` / `Collab/Gleb` |
-| XiChen26honors (Honours) | Convenor + coordinator | `joan.licata@anu.edu.au`, `galina.levitina@anu.edu.au` | `from:(joan.licata OR galina.levitina) AND (xi chen OR chen OR honours)` | `+xichen` / `Collab/XiChen` |
+| XiChen26honors (Honours) | Convener (+ honours-mail contact) | `joan.licata@anu.edu.au` (formal Honours Convener), `galina.levitina@anu.edu.au` (no formal role; appears in honours mail) | `from:(joan.licata OR galina.levitina) AND (xi chen OR chen OR honours)` | `+xichen` / `Collab/XiChen` |
 
 ⚠️ James Tener / `hdr.css` are **PhD-only** — they do NOT apply to honours.
 ⚠️ Bare `chen` is a common surname — keep it paired with the honours-admin sender.
