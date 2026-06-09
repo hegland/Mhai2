@@ -64,6 +64,12 @@ Projects care about **research email only**, not social/logistics (coffee, lunch
   csiro.au) — include both or lose half the history.
 - **Short recycled subjects** ("Meeting today?", "RE:") make subject-filtering
   useless (esp. Frank) — `from:(…)` is the only reliable catch.
+- **Plus-tag typos misroute silently.** Gmail delivers *any* `+anything` to the base
+  inbox, so a mistyped tag (observed 2026-06-10: `+VRZM25` for `+VRZM26`, and the
+  content was actually FdHMH) still "arrives" but won't match the intended filter —
+  it sits unlabelled with no bounce or warning. Double-check the tag when sending;
+  periodically sweep for stray `+tags` that match no known project. Also check the
+  tag matches the *content's* project (Frank = `+FdHMH`, not a VRZM tag).
 - **Backfill ≠ live rule.** Outlook rules act only on *incoming* mail; for historical
   2026 mail use desktop Outlook **"Run Rules Now"** on a folder, or select-all →
   forward. Forwarded mail also gets **today's** Gmail timestamp (true date only in
