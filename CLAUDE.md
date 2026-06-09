@@ -81,25 +81,58 @@ Located at `~/.hermes/skills/mhai2/`:
 hermes skills list   # see all skills
 ```
 
-## Scanning Physical Documents (learned 2026-05-31)
+## Scanning Physical Documents (scan-pages v4.0.0, rewritten 2026-06-07)
 
 Uses the Canon CanoScan LiDE 400 (`escl:http://localhost:60000`) via `scanimage`.
 
-Multi-turn workflow — each Telegram message triggers one page scan:
+Multi-turn workflow — each Telegram message triggers one page scan. The flatbed
+scans one physical page per call, so pages are scanned individually into `raw/`,
+then OCR-combined into ONE markdown file at the end:
 
 ```
-/scan-pages Scan pages 55 to 64 from the DBT skills training workbook
+/scan-pages Scan pages 65 to 73 from the DBT skills training workbook
 → scans first page immediately, saves state
 
 /scan-pages next   ← repeat for each subsequent page
+→ on the LAST page, auto-OCRs all pages into one markdown file
 ```
 
-State persists in `~/.hermes/scan_state.json` between turns. Deleted automatically when complete.
-Output: `~/projects/DBT/scans/dbt_skills_workbook_p055.pdf` etc.
+**Architecture — one `terminal` command per turn (no orchestration):**
+All per-turn logic lives in two scripts under `~/.hermes/skills/mhai2/scan-pages/scripts/`:
+- `scan.py` — driver. `scan.py start --title "..." --pages 65-73 --output-dir <dir>`
+  scans page 1; `scan.py next` scans the next page and, on the last page, runs the
+  combine and deletes state. Mhai2 issues exactly one command per turn.
+- `combine_to_markdown.py` — OCRs each `raw/*.pdf` into one combined markdown
+  (`<slug>_p<first>-p<last>.md`) with `# title` + `## Page N` headers.
+
+State persists in `~/.hermes/scan_state.json` between turns; deleted when complete.
+
+**Output:**
+- Per-page PDFs: `~/projects/DBT/scans/raw/dbt_skills_training_workbook_p065.pdf` etc. (kept)
+- Combined markdown: `~/projects/DBT/scans/dbt_skills_training_workbook_p065-p073.md`
+
+**OCR engine:** Tesseract only — plain text, fast (seconds per job). Raw per-page
+PDFs are kept in `raw/`, so a job can be re-OCR'd later without re-scanning if a
+better tool ever becomes practical. (marker-pdf was trialled 2026-06-07 and
+rejected: ~1 hour for 9 pages on this CPU-only machine, no usable quality gain
+over Tesseract. Don't reach for it again without a GPU.)
+
+Output-dir mapping (in SKILL.md Step A): DBT → `~/projects/DBT/scans`,
+VRZM26 → `~/Desktop/VRZM26/scans`, FdHMH → `~/Desktop/FdHMH/scans`, else ask.
+
+**Why the rewrite (root causes of past stalls):**
+- v2/v3 made Mhai2 orchestrate 4–5 tool calls per turn (mkdir + write state +
+  scanimage + increment). She routed the increment through `execute_code`, which
+  HUNG for minutes and stalled the job. v4 collapses each turn to one `scan.py`
+  call via `terminal` — no orchestration surface, and SKILL.md forbids `execute_code`.
+- v2 stopped at loose per-page PDFs (no combine); she'd then try to `read_file`
+  the image PDFs and wrongly call them "empty." v4 always produces the combined
+  markdown, and SKILL.md warns never to read raw image PDFs to "check" them.
 
 **Key lessons:**
 - Mhai2 ignores skills that conflict with her training ("I can't scan hardware") — always invoke via `/skill-name`, never rely on conversational requests
-- After adding a new skill, delete `~/.hermes/.skills_prompt_snapshot.json` and restart the gateway
+- After changing a skill, delete `~/.hermes/.skills_prompt_snapshot.json` and restart the gateway
+- Restarting the gateway drops the active Telegram session's project lock — re-send the project name (e.g. `DBT`) afterward before continuing
 - SOUL.md now has a CRITICAL block overriding the "no hardware access" belief
 - `~/projects/agent/` is read-only (`chmod -R a-w`) — original Mhai, never modify
 
@@ -416,3 +449,20 @@ systemctl --user start hermes-dashboard hermes-workspace
 - Added CRITICAL section to `~/.hermes/SOUL.md` — Mhai2 must never answer Hermes questions from memory (Gemini has no training data for Hermes)
 - Rule: load `/hermes-docs` skill, fetch `https://hermes-agent.nousresearch.com/docs/llms.txt` via browser, then answer from what is read
 - Also documented that "Hermes Workspace" is a real community project (hermes-workspace.com) not an official NousResearch product
+
+### 2026-06-09
+
+#### LLM provider outage + migration to free providers
+- **Symptom:** every Telegram message failed with "The model provider has rate limited requests."
+- **Root cause (NOT a rate limit):** the pay-as-you-go Gemini API key (`provider: gemini`, AI Studio) ran out of prepaid credit → HTTP 429 `RESOURCE_EXHAUSTED: prepayment credits depleted`. Hermes mislabels that 429 as "rate limited" and burns 6 slow retries per message before failing. The Anthropic fallback was also dead (credit balance too low). So every message dead-ended.
+- **Fix — switched to free providers (config.yaml):**
+  - Main model: `provider: gemini` → `google-gemini-cli`, `model: gemini-2.5-flash` → `gemini-2.5-flash-lite`. Runs free on Markus's Google One AI Premium OAuth (`~/.gemini/oauth_creds.json`), NOT the dead pay-as-you-go key.
+  - Added fallback chain: `copilot` / `gpt-5.4-mini` — free via Markus's GitHub **academic** Copilot Pro. Fires only on primary error (rate-limit/5xx/connection). Manage with `hermes fallback list/add/remove`.
+  - Auxiliary slots (vision, web_extract, compression, session_search): set to `provider: auto`, `model: ''`. OAuth providers aren't supported for auxiliary ("OAuth provider google-gemini-cli not directly supported, try 'auto'"); and pinning a gemini model name under `auto` would route back to the dead pay-as-you-go key.
+- **Copilot model selection:** initially set fallback to `gpt-4o`, but the Telegram `/model` Copilot picker only surfaces the current-gen list (gpt-5.4, gpt-5.5, gpt-5-mini, gpt-5.4-mini). gpt-4o still works via the token but GitHub is phasing it out — switched fallback to `gpt-5.4-mini`. Full token model list: `curl https://api.githubcopilot.com/models -H "Authorization: Bearer $(gh auth token)" -H "Editor-Version: vscode/1.0" -H "Copilot-Integration-Id: vscode-chat"`.
+- **Verified:** gpt-5.4-mini generates AND tool-calls correctly (unguessable-secret test passed); DBT coaching responds well via the live gateway.
+- **Cost reality:** both paths are $0/token under subscriptions Markus already holds. The per-token "$/M" shown by Telegram `/model` is the upstream list price from Hermes's model DB, not a real charge. "Mini" Copilot models are included/quota-safe; full gpt-5.4/5.5/Claude/Gemini-via-Copilot consume the monthly premium-request allowance — never set one as daily primary. Check usage at github.com/settings/copilot.
+- **Quota/throttling:** Gemini OAuth is the bottleneck (~10 RPM shared); bursts overflow automatically to the Copilot mini fallback at no premium cost. Design intent: cheap/fast Gemini answers everything; Copilot mini only catches failures.
+- **Rejected fallback:** local Ollama — extremely slow on this CPU-only box (minutes/response); worse than a clean retry.
+- **Telegram usage rules:** lock the project FIRST (e.g. send `DBT`), THEN `/model` — switching projects triggers a session reset that wipes the model override. `/model` is session-only unless `--global`; after `/new`, the 4am reset, or a gateway restart it reverts to Gemini primary + Copilot fallback.
+- **Confirming which model answered:** `/model` shows the active primary; successful calls don't log the model name, only failures/fallbacks log a WARNING — so `grep -aiE "fallback|429|RESOURCE_EXHAUSTED" ~/.hermes/logs/gateway.log` empty = selected model handled it.
