@@ -47,6 +47,12 @@ unreachable; browser automation possible but fragile and not worth it). So:
 Tip: phrase the query exactly like that — it returns both the address list AND a
 content breakdown (which is what reveals research-dominant vs mixed).
 
+**ANU address patterns (so staff addresses don't need looking up):**
+- **Staff:** always `firstname.lastname@anu.edu.au` — derivable directly from the name.
+- **Students:** ID form `u#######@anu.edu.au` (e.g. Xi Chen `u7641463@anu.edu.au`);
+  some also have a named alias, some don't.
+- **Functional/shared mailboxes** are the exception (e.g. `hdr.css@anu.edu.au`).
+
 ### Research-only scope & the two collaborator classes
 
 Projects care about **research email only**, not social/logistics (coffee, lunches,
