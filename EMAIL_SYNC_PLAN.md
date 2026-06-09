@@ -57,6 +57,17 @@ Projects care about **research email only**, not social/logistics (coffee, lunch
 - **mixed** (e.g. Conrad — mostly social) — **no live blanket rule**; hand-pick
   research threads for the backfill, and capture future research mail ad hoc via
   `/save-email`.
+- **admin / scoped** (e.g. a PhD convenor or HDR administrator) — these people email
+  about **many** students, so a sender-only filter would flood the bucket with
+  unrelated HDR business. Use a **content-scoped** filter that intersects the sender
+  with the student:
+  `from:(<admin-person>) AND (<Student> OR <Surname> OR <student-ID>)`.
+  Each student project (GlebPhD, XiChen26honors, …) typically has a convenor + HDR
+  admin in this class. Discovery pattern: `<student> AND (hdr OR <convenor-surname>
+  OR extension)`. Route the matching mail into the *student's own* bucket (e.g.
+  admin-about-Gleb → `+gleb` → `Collab/Gleb`); the content scope keeps other
+  students out. Worked example (GlebPhD): convenor `James.Tener@anu.edu.au` + HDR
+  functional mailbox `hdr.css@anu.edu.au`, scoped with `(gleb OR shabernev)`.
 
 ### Gotchas learned
 - People use **several addresses**; each `from:(…)` filter needs an OR-list of
