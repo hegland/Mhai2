@@ -52,6 +52,9 @@ content breakdown (which is what reveals research-dominant vs mixed).
 - **Students:** ID form `u#######@anu.edu.au` (e.g. Xi Chen `u7641463@anu.edu.au`);
   some also have a named alias, some don't.
 - **Functional/shared mailboxes** are the exception (e.g. `hdr.css@anu.edu.au`).
+- **Verify staff via the public ANU/MSI directory** (`maths.anu.edu.au/people/<first>-<last>`,
+  or `researchers.anu.edu.au`) — confirms the address AND the *role* (the part you
+  can't derive from the name). E.g. James Tener verified as Assoc. Prof. / HDR Convener.
 
 ### Research-only scope & the two collaborator classes
 
