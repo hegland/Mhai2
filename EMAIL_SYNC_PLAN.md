@@ -82,6 +82,47 @@ Projects care about **research email only**, not social/logistics (coffee, lunch
   Licata + active coordinator Galina Levitina; the HDR people do NOT apply. Always
   match the admin layer to the program level.
 
+### Backfill method — copy emails as .eml attachments (VALIDATED 2026-06-10)
+
+Outlook resists bulk-forwarding and Copilot can't do GUI actions, so the working
+way to backfill a project's historical mail is **manual copy-paste-as-attachments**
+(proven with the Gleb backfill: produced 64 clean, parseable `.eml` files):
+
+1. **Search** (Copilot or search bar) for the project's mail; **sort by date** so the
+   wanted items are contiguous. Include **Sent Items** to capture "to <person>" mail.
+2. **Select by Shift+click** (first item, then Shift+click last) for a range;
+   **Ctrl+click** to add/remove individual ones. Avoid the hover checkboxes (new
+   Outlook puts you in a different selection mode that doesn't copy cleanly).
+3. Open a **new email** (NOT the Forward button — a blank new message is the key
+   move that makes Outlook embed the messages as attachments). Then either
+   **Ctrl+C → click in the body → Ctrl+V**, OR **drag the selection into the body**.
+   Drag-and-drop is the more reliable of the two across Outlook builds (Copilot
+   concurs) — prefer it if paste ever lags or drops items.
+4. **Wait** until every attachment finishes uploading before sending.
+5. **To:** `markus.hegland+<project>@gmail.com` → Send.
+
+Validated both empirically (Gleb: 64 clean `.eml`) and by Outlook Copilot's analysis
+(2026-06-10). Note: the result was `.eml` (not `.msg`) → confirms Markus is on **new
+Outlook/OWA**; classic desktop would yield proprietary `.msg` needing a different
+parser, so keep using the same Outlook.
+
+Division of labour: Copilot only does the *search*; the select/copy/paste/send is
+manual (Copilot can't click rows or paste into compose).
+
+Critical constraints:
+- **⚠️ 25 MB Gmail cap** — batch so each forward stays under ~20 MB. Document-heavy
+  emails (thesis PDFs, signed forms) blow the budget fast; the Gleb batch hit 24 MB.
+- **Use NEW Outlook / OWA** → gives `.eml` (parseable). Classic desktop gives `.msg`
+  (proprietary, harder). 
+- Duplicates are fine — dedupe happens on extraction.
+- Fallback if paste won't attach: drag selection onto the compose window, or drag to
+  a desktop folder then attach.
+
+Extraction side: Claude pulls the carrier message from Gmail (`to:…+<tag>@gmail.com`),
+parses the `.eml` attachments (Python `email` module), dedupes, reads them, and
+proposes tasks. Can also save the `.eml` files into the project's `emails/` folder
+(done for GlebPhD: 64 files in ~/Desktop/StudentProjects/GlebPhD/emails/).
+
 ### Gotchas learned
 - People use **several addresses**; each `from:(…)` filter needs an OR-list of
   local-parts. Some **switch addresses mid-year** (Frank: data61.csiro.au →
