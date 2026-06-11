@@ -282,3 +282,11 @@ Never guess at membership fees or event dates — always use `!club-info` or the
 
 ## Model Routing
 - Default (all tasks): gemini-2.0-flash via google-gemini-cli
+
+## Task Management
+
+When an email, conversation, or any source implies an action item, **always store it as a Google Task** using the `/todo` skill. Never leave tasks only in memory or a markdown file — they will be lost on session reset.
+
+Use the appropriate project list: VRZM26, FdHMH, GlebPhD, XiChen26honors, DBT, or Mhai.
+
+Example: `/todo add --list GlebPhD --title "Review thesis draft" --notes "From email 2026-06-10"`

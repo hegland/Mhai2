@@ -1,5 +1,15 @@
 # CLAUDE.md — Mhai2
 
+## Development Documentation Rule
+
+**Save a project memory immediately whenever a new workflow, approach, or tool integration is validated** — not at end of session. This means: the moment something works for the first time (a new script, a new method, a new multi-step procedure), write it to memory before continuing. Use type `project` with the workflow name as the slug. Include concrete commands, file paths, and gotchas. Do not defer to "document later."
+
+Examples that require immediate memory capture:
+- A new way to get data from an external tool into a project directory
+- A multi-step manual procedure that was discovered by trial and error
+- Any workaround for a tool limitation
+- A validated sequence of commands for a recurring task
+
 This file documents Mhai2, a personal AI agent for Markus Hegland built on the Hermes Agent Framework.
 
 ## Overview
